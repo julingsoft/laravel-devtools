@@ -31,13 +31,8 @@ class GenEnums extends Command
      */
     public function handle(): void
     {
-        $apiDir = app_path('Http/API');
-        if (is_dir($apiDir)) {
-            $this->deleteDirectories($apiDir);
-        }
-
         $tables = $this->getTables();
-        foreach ($tables as $table) {
+        foreach ($tables as $key => $table) {
             $className = Str::studly(Str::singular($table['name']));
             $comment = $table['comment'];
             if (Str::endsWith($comment, '表')) {
@@ -45,12 +40,13 @@ class GenEnums extends Command
             }
             $comment .= '模块';
             $this->enumsTpl($className, $comment);
+            $this->errorTpl($className, $comment, $key + 101);
         }
     }
 
     public function enumsTpl(string $name, string $comment): void
     {
-        $dist = app_path('Http/API/Enums/'.$name);
+        $dist = app_path('Enums/'.$name);
         if (! is_dir($dist)) {
             $this->ensureDirectoryExists($dist);
         }
@@ -63,6 +59,29 @@ class GenEnums extends Command
             $name,
             $comment,
         ], $content);
-        file_put_contents(app_path('Http/API/Enums/'.$name.'/'.$name.'StatusEnum.php'), $content);
+        file_put_contents(app_path('Enums/'.$name.'/'.$name.'StatusEnum.php'), $content);
+    }
+
+    private function errorTpl(string $name, string $comment, int $index): void
+    {
+        $dist = app_path('Enums/'.$name);
+        if (! is_dir($dist)) {
+            $this->ensureDirectoryExists($dist);
+        }
+
+        $errorEnumsFile = app_path('Enums/'.$name.'/'.$name.'ErrorEnum.php');
+        if (! file_exists($errorEnumsFile)) {
+            $content = file_get_contents(__DIR__.'/stubs/enums/error.stub');
+            $content = str_replace([
+                '{$name}',
+                '{$comment}',
+                '{$index}',
+            ], [
+                $name,
+                $comment,
+                $index,
+            ], $content);
+            file_put_contents($errorEnumsFile, $content);
+        }
     }
 }

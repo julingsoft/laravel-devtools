@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Juling\DevTools\Console\Commands\GenController;
 use Juling\DevTools\Console\Commands\GenDict;
 use Juling\DevTools\Console\Commands\GenEntity;
+use Juling\DevTools\Console\Commands\GenEnums;
 use Juling\DevTools\Console\Commands\GenModel;
 use Juling\DevTools\Console\Commands\GenRepository;
 use Juling\DevTools\Console\Commands\GenRoute;
@@ -38,6 +39,7 @@ class DevToolsServiceProvider extends ServiceProvider
                 GenController::class,
                 GenDict::class,
                 GenEntity::class,
+                GenEnums::class,
                 GenModel::class,
                 GenRepository::class,
                 GenRoute::class,

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\API\Responses\{$name};
+namespace App\Http\Responses{$subModule}\{$name};
 
 use App\Http\Responses\PaginateLinkVo;
 use Juling\Foundation\Support\ArrayHelper;

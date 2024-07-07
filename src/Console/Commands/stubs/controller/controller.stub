@@ -2,17 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Http\API\Controllers;
+namespace App\Http\Controllers{$subModule};
 
 use App\Entities\{$name}Entity;
-use App\Http\API\Enums\{$name}\{$name}StatusEnum;
-use App\Http\API\Requests\{$name}\{$name}CreateRequest;
-use App\Http\API\Requests\{$name}\{$name}QueryRequest;
-use App\Http\API\Requests\{$name}\{$name}UpdateRequest;
-use App\Http\API\Responses\{$name}\{$name}DestroyResponse;
-use App\Http\API\Responses\{$name}\{$name}QueryResponse;
-use App\Http\API\Responses\{$name}\{$name}Response;
+use App\Enums\{$name}\{$name}ErrorEnum;
+use App\Enums\{$name}\{$name}StatusEnum;
 use App\Http\Controllers\Controller;
+use App\Http\Requests{$subModule}\{$name}\{$name}CreateRequest;
+use App\Http\Requests{$subModule}\{$name}\{$name}QueryRequest;
+use App\Http\Requests{$subModule}\{$name}\{$name}UpdateRequest;
+use App\Http\Responses{$subModule}\{$name}\{$name}DestroyResponse;
+use App\Http\Responses{$subModule}\{$name}\{$name}QueryResponse;
+use App\Http\Responses{$subModule}\{$name}\{$name}Response;
 use App\Services\{$name}Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\API\Responses\{$name};
+namespace App\Http\Responses{$subModule}\{$name};
 
 use Juling\Foundation\Support\ArrayHelper;
 use OpenApi\Attributes as OA;

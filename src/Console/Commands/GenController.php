@@ -26,12 +26,14 @@ class GenController extends Command
      */
     protected $description = 'Generate controller classes';
 
+    private string $subModule = '/Admin';
+
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        $apiDir = app_path('Http/API');
+        $apiDir = app_path('Http'.$this->subModule);
         if (is_dir($apiDir)) {
             $this->deleteDirectories($apiDir);
         }
@@ -54,7 +56,7 @@ class GenController extends Command
 
     private function controllerTpl(string $name, string $comment): void
     {
-        $dist = app_path('Http/API/Controllers');
+        $dist = app_path('Http/Controllers'.$this->subModule);
         if (! is_dir($dist)) {
             $this->ensureDirectoryExists($dist);
         }
@@ -64,17 +66,19 @@ class GenController extends Command
             '{$name}',
             '{$camelName}',
             '{$comment}',
+            '{$subModule}',
         ], [
             $name,
             Str::camel($name),
             $comment,
+            Str::replace('/', '\\', $this->subModule),
         ], $content);
-        file_put_contents(app_path('Http/API/Controllers/'.$name.'Controller.php'), $content);
+        file_put_contents(app_path('Http/Controllers'.$this->subModule.'/'.$name.'Controller.php'), $content);
     }
 
     private function requestTpl(string $name, array $columns): void
     {
-        $dist = app_path('Http/API/Requests/'.$name);
+        $dist = app_path('Http/Requests'.$this->subModule.'/'.$name);
         if (! is_dir($dist)) {
             $this->ensureDirectoryExists($dist);
         }
@@ -139,6 +143,7 @@ class GenController extends Command
             '{$dataSets[properties]}',
             '{$dataSets[rule]}',
             '{$dataSets[message]}',
+            '{$subModule}',
         ], [
             $name,
             $name.$suffix,
@@ -146,13 +151,14 @@ class GenController extends Command
             $properties,
             $rule,
             $message,
+            Str::replace('/', '\\', $this->subModule),
         ], $content);
-        file_put_contents(app_path('Http/API/Requests/'.$name.'/'.$name.$suffix.'.php'), $content);
+        file_put_contents(app_path('Http/Requests'.$this->subModule.'/'.$name.'/'.$name.$suffix.'.php'), $content);
     }
 
     private function responseTpl(string $name, array $columns): void
     {
-        $dist = app_path('Http/API/Responses/'.$name);
+        $dist = app_path('Http/Responses'.$this->subModule.'/'.$name);
         if (! is_dir($dist)) {
             $this->ensureDirectoryExists($dist);
         }
@@ -160,18 +166,22 @@ class GenController extends Command
         $content = file_get_contents(__DIR__.'/stubs/response/query.stub');
         $content = str_replace([
             '{$name}',
+            '{$subModule}',
         ], [
             $name,
+            Str::replace('/', '\\', $this->subModule),
         ], $content);
-        file_put_contents(app_path('Http/API/Responses/'.$name.'/'.$name.'QueryResponse.php'), $content);
+        file_put_contents(app_path('Http/Responses'.$this->subModule.'/'.$name.'/'.$name.'QueryResponse.php'), $content);
 
         $content = file_get_contents(__DIR__.'/stubs/response/destroy.stub');
         $content = str_replace([
             '{$name}',
+            '{$subModule}',
         ], [
             $name,
+            Str::replace('/', '\\', $this->subModule),
         ], $content);
-        file_put_contents(app_path('Http/API/Responses/'.$name.'/'.$name.'DestroyResponse.php'), $content);
+        file_put_contents(app_path('Http/Responses'.$this->subModule.'/'.$name.'/'.$name.'DestroyResponse.php'), $content);
 
         $ignoreFields = ['deleted_time', 'password', 'password_salt'];
 
@@ -207,10 +217,12 @@ class GenController extends Command
         $content = str_replace([
             '{$name}',
             '{$fields}',
+            '{$subModule}',
         ], [
             $name,
             $fields,
+            Str::replace('/', '\\', $this->subModule),
         ], $content);
-        file_put_contents(app_path('Http/API/Responses/'.$name.'/'.$name.'Response.php'), $content);
+        file_put_contents(app_path('Http/Responses'.$this->subModule.'/'.$name.'/'.$name.'Response.php'), $content);
     }
 }

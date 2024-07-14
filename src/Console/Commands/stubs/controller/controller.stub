@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers{$subModule};
+namespace {$namespace}\Controllers;
 
 use App\Entities\{$name}Entity;
 use App\Enums\{$name}\{$name}ErrorEnum;
 use App\Enums\{$name}\{$name}StatusEnum;
 use App\Http\Controllers\Controller;
-use App\Http\Requests{$subModule}\{$name}\{$name}CreateRequest;
-use App\Http\Requests{$subModule}\{$name}\{$name}QueryRequest;
-use App\Http\Requests{$subModule}\{$name}\{$name}UpdateRequest;
-use App\Http\Responses{$subModule}\{$name}\{$name}DestroyResponse;
-use App\Http\Responses{$subModule}\{$name}\{$name}QueryResponse;
-use App\Http\Responses{$subModule}\{$name}\{$name}Response;
+use {$namespace}\Requests\{$name}\{$name}CreateRequest;
+use {$namespace}\Requests\{$name}\{$name}QueryRequest;
+use {$namespace}\Requests\{$name}\{$name}UpdateRequest;
+use {$namespace}\Responses\{$name}\{$name}DestroyResponse;
+use {$namespace}\Responses\{$name}\{$name}QueryResponse;
+use {$namespace}\Responses\{$name}\{$name}Response;
 use App\Services\{$name}Service;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,24 @@ use Throwable;
 
 class {$name}Controller extends Controller
 {
+    #[OA\Get(path: '/{$camelName}', summary: '显示列表页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    public function index(): Renderable
+    {
+        return view('{$viewNamespace}::{$camelName}.index');
+    }
+
+    #[OA\Get(path: '/{$camelName}/create', summary: '新增表单页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    public function create(): Renderable
+    {
+        return view('{$viewNamespace}::{$camelName}.create');
+    }
+
+    #[OA\Get(path: '/{$camelName}/edit', summary: '编辑表单页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    public function edit(): Renderable
+    {
+        return view('{$viewNamespace}::{$camelName}.edit');
+    }
+
     #[OA\Post(path: '/{$camelName}/query', summary: '查询列表接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
     #[OA\Parameter(name: 'page', description: '当前页码', in: 'query', required: true, example: 1)]
     #[OA\Parameter(name: 'pageSize', description: '每页分页数', in: 'query', required: false, example: 10)]
@@ -60,10 +79,10 @@ class {$name}Controller extends Controller
         }
     }
 
-    #[OA\Post(path: '/{$camelName}/create', summary: '新增接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Post(path: '/{$camelName}/store', summary: '新增接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
     #[OA\RequestBody(required: true, content: new OA\JsonContent(ref: {$name}CreateRequest::class))]
     #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {$name}Response::class))]
-    public function create({$name}CreateRequest $createRequest): JsonResponse
+    public function store({$name}CreateRequest $createRequest): JsonResponse
     {
         $request = $createRequest->validated();
 

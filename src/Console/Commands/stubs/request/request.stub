@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests{$subModule}\{$name};
+namespace {$namespace}\Requests\{$name};
 
 use Illuminate\Foundation\Http\FormRequest;
 use OpenApi\Attributes as OA;

@@ -25,6 +25,8 @@ trait SchemaTrait
 
     private function getTables(): array
     {
+        $this->ignoreTables = array_merge($this->ignoreTables, config('devtools.ignore_tables', []));
+
         $tables = Schema::getTables();
 
         foreach ($tables as $key => $table) {

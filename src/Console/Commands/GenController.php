@@ -26,16 +26,16 @@ class GenController extends Command
      */
     protected $description = 'Generate controller classes';
 
-    private string $subModule = '/Admin';
-
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        $apiDir = app_path('Http'.$this->subModule);
-        if (is_dir($apiDir)) {
-            $this->deleteDirectories($apiDir);
+        $distDir = config('devtools.dist');
+        if (is_dir($distDir)) {
+            $this->deleteDirectories($distDir.'/Controllers');
+            $this->deleteDirectories($distDir.'/Requests');
+            $this->deleteDirectories($distDir.'/Responses');
         }
 
         $tables = $this->getTables();
@@ -56,9 +56,9 @@ class GenController extends Command
 
     private function controllerTpl(string $name, string $comment): void
     {
-        $dist = app_path('Http/Controllers'.$this->subModule);
-        if (! is_dir($dist)) {
-            $this->ensureDirectoryExists($dist);
+        $distDir = config('devtools.dist').'/Controllers';
+        if (! is_dir($distDir)) {
+            $this->ensureDirectoryExists($distDir);
         }
 
         $content = file_get_contents(__DIR__.'/stubs/controller/controller.stub');
@@ -66,21 +66,23 @@ class GenController extends Command
             '{$name}',
             '{$camelName}',
             '{$comment}',
-            '{$subModule}',
+            '{$namespace}',
+            '{$viewNamespace}',
         ], [
             $name,
             Str::camel($name),
             $comment,
-            Str::replace('/', '\\', $this->subModule),
+            config('devtools.namespace'),
+            Str::camel(basename(config('devtools.dist'))),
         ], $content);
-        file_put_contents(app_path('Http/Controllers'.$this->subModule.'/'.$name.'Controller.php'), $content);
+        file_put_contents(config('devtools.dist').'/Controllers/'.$name.'Controller.php', $content);
     }
 
     private function requestTpl(string $name, array $columns): void
     {
-        $dist = app_path('Http/Requests'.$this->subModule.'/'.$name);
-        if (! is_dir($dist)) {
-            $this->ensureDirectoryExists($dist);
+        $distDir = config('devtools.dist').'/Requests/'.$name;
+        if (! is_dir($distDir)) {
+            $this->ensureDirectoryExists($distDir);
         }
 
         $ignoreFields = ['id', 'created_at', 'updated_at', 'deleted_at'];
@@ -143,7 +145,7 @@ class GenController extends Command
             '{$dataSets[properties]}',
             '{$dataSets[rule]}',
             '{$dataSets[message]}',
-            '{$subModule}',
+            '{$namespace}',
         ], [
             $name,
             $name.$suffix,
@@ -151,37 +153,37 @@ class GenController extends Command
             $properties,
             $rule,
             $message,
-            Str::replace('/', '\\', $this->subModule),
+            config('devtools.namespace'),
         ], $content);
-        file_put_contents(app_path('Http/Requests'.$this->subModule.'/'.$name.'/'.$name.$suffix.'.php'), $content);
+        file_put_contents(config('devtools.dist').'/Requests/'.$name.'/'.$name.$suffix.'.php', $content);
     }
 
     private function responseTpl(string $name, array $columns): void
     {
-        $dist = app_path('Http/Responses'.$this->subModule.'/'.$name);
-        if (! is_dir($dist)) {
-            $this->ensureDirectoryExists($dist);
+        $distDir = config('devtools.dist').'/Responses/'.$name;
+        if (! is_dir($distDir)) {
+            $this->ensureDirectoryExists($distDir);
         }
 
         $content = file_get_contents(__DIR__.'/stubs/response/query.stub');
         $content = str_replace([
             '{$name}',
-            '{$subModule}',
+            '{$namespace}',
         ], [
             $name,
-            Str::replace('/', '\\', $this->subModule),
+            config('devtools.namespace'),
         ], $content);
-        file_put_contents(app_path('Http/Responses'.$this->subModule.'/'.$name.'/'.$name.'QueryResponse.php'), $content);
+        file_put_contents(config('devtools.dist').'/Responses/'.$name.'/'.$name.'QueryResponse.php', $content);
 
         $content = file_get_contents(__DIR__.'/stubs/response/destroy.stub');
         $content = str_replace([
             '{$name}',
-            '{$subModule}',
+            '{$namespace}',
         ], [
             $name,
-            Str::replace('/', '\\', $this->subModule),
+            config('devtools.namespace'),
         ], $content);
-        file_put_contents(app_path('Http/Responses'.$this->subModule.'/'.$name.'/'.$name.'DestroyResponse.php'), $content);
+        file_put_contents(config('devtools.dist').'/Responses/'.$name.'/'.$name.'DestroyResponse.php', $content);
 
         $ignoreFields = ['deleted_time', 'password', 'password_salt'];
 
@@ -217,12 +219,12 @@ class GenController extends Command
         $content = str_replace([
             '{$name}',
             '{$fields}',
-            '{$subModule}',
+            '{$namespace}',
         ], [
             $name,
             $fields,
-            Str::replace('/', '\\', $this->subModule),
+            config('devtools.namespace'),
         ], $content);
-        file_put_contents(app_path('Http/Responses'.$this->subModule.'/'.$name.'/'.$name.'Response.php'), $content);
+        file_put_contents(config('devtools.dist').'/Responses/'.$name.'/'.$name.'Response.php', $content);
     }
 }

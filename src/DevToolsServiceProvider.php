@@ -14,6 +14,7 @@ use Juling\DevTools\Console\Commands\GenRepository;
 use Juling\DevTools\Console\Commands\GenRoute;
 use Juling\DevTools\Console\Commands\GenService;
 use Juling\DevTools\Console\Commands\GenTypescript;
+use Juling\DevTools\Console\Commands\GenView;
 use Juling\DevTools\Console\Commands\InitCommand;
 use Juling\DevTools\Support\GenerateStub;
 
@@ -24,7 +25,7 @@ class DevToolsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-
+        $this->mergeConfigFrom(dirname(__DIR__) . '/config/devtools.php', 'devtools');
     }
 
     /**
@@ -32,6 +33,10 @@ class DevToolsServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->publishes([
+            dirname(__DIR__).'/config/devtools.php' => config_path('devtools.php'),
+        ]);
+
         $this->app->bind('generate-stub', fn ($app) => new GenerateStub);
 
         if ($this->app->runningInConsole()) {
@@ -45,6 +50,7 @@ class DevToolsServiceProvider extends ServiceProvider
                 GenRoute::class,
                 GenService::class,
                 GenTypescript::class,
+                GenView::class,
                 InitCommand::class,
             ]);
         }

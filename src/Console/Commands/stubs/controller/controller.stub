@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace {$namespace}\Controllers;
 
 use App\Entities\{$name}Entity;
-use App\Enums\{$name}\{$name}ErrorEnum;
-use App\Enums\{$name}\{$name}StatusEnum;
 use App\Http\Controllers\Controller;
 use {$namespace}\Requests\{$name}\{$name}CreateRequest;
 use {$namespace}\Requests\{$name}\{$name}QueryRequest;
@@ -20,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Juling\Foundation\Enums\BusinessCodeEnum;
 use Juling\Foundation\Exceptions\CustomException;
 use OpenApi\Attributes as OA;
 use Throwable;
@@ -75,7 +74,7 @@ class {$name}Controller extends Controller
 
             Log::error($e);
 
-            return $this->error({$name}ErrorEnum::QUERY_ERROR);
+            return $this->error(BusinessCodeEnum::QUERY_ERROR);
         }
     }
 
@@ -98,7 +97,7 @@ class {$name}Controller extends Controller
                 return $this->success();
             }
 
-            throw new CustomException({$name}ErrorEnum::CREATE_FAIL);
+            throw new CustomException(BusinessCodeEnum::CREATE_FAIL);
         } catch (Throwable $e) {
             DB::rollBack();
 
@@ -108,7 +107,7 @@ class {$name}Controller extends Controller
 
             Log::error($e);
 
-            return $this->error({$name}ErrorEnum::CREATE_ERROR);
+            return $this->error(BusinessCodeEnum::CREATE_ERROR);
         }
     }
 
@@ -124,7 +123,7 @@ class {$name}Controller extends Controller
 
             ${$camelName} = ${$camelName}Service->getOneById($id);
             if (empty(${$camelName})) {
-                throw new CustomException({$name}ErrorEnum::NOT_FOUND);
+                throw new CustomException(BusinessCodeEnum::NOT_FOUND);
             }
 
             $response = new {$name}Response();
@@ -138,7 +137,7 @@ class {$name}Controller extends Controller
 
             Log::error($e);
 
-            return $this->error({$name}ErrorEnum::SHOW_ERROR);
+            return $this->error(BusinessCodeEnum::SHOW_ERROR);
         }
     }
 
@@ -156,7 +155,7 @@ class {$name}Controller extends Controller
 
             ${$camelName} = ${$camelName}Service->getOneById($id);
             if (empty(${$camelName})) {
-                throw new CustomException({$name}ErrorEnum::NOT_FOUND);
+                throw new CustomException(BusinessCodeEnum::NOT_FOUND);
             }
 
             $input = new {$name}Entity();
@@ -176,7 +175,7 @@ class {$name}Controller extends Controller
 
             Log::error($e);
 
-            return $this->error({$name}ErrorEnum::UPDATE_ERROR);
+            return $this->error(BusinessCodeEnum::UPDATE_ERROR);
         }
     }
 
@@ -193,7 +192,7 @@ class {$name}Controller extends Controller
 
             ${$camelName} = ${$camelName}Service->getOneById($id);
             if (empty(${$camelName})) {
-                throw new CustomException({$name}ErrorEnum::NOT_FOUND);
+                throw new CustomException(BusinessCodeEnum::NOT_FOUND);
             }
 
             if (${$camelName}Service->removeById($id)) {
@@ -202,7 +201,7 @@ class {$name}Controller extends Controller
                 return $this->success();
             }
 
-            throw new CustomException({$name}ErrorEnum::DESTROY_FAIL);
+            throw new CustomException(BusinessCodeEnum::DESTROY_FAIL);
         } catch (Throwable $e) {
             DB::rollBack();
 
@@ -212,7 +211,7 @@ class {$name}Controller extends Controller
 
             Log::error($e);
 
-            return $this->error({$name}ErrorEnum::DESTROY_ERROR);
+            return $this->error(BusinessCodeEnum::DESTROY_ERROR);
         }
     }
 }

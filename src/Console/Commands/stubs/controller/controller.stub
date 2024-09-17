@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace {$namespace}\Controllers;
 
 use App\Entities\{$name}Entity;
+use App\Enums\BusinessCodeEnum;
+use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use {$namespace}\Requests\{$name}\{$name}CreateRequest;
 use {$namespace}\Requests\{$name}\{$name}QueryRequest;
@@ -18,8 +20,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Juling\Foundation\Enums\BusinessCodeEnum;
-use Juling\Foundation\Exceptions\CustomException;
 use OpenApi\Attributes as OA;
 use Throwable;
 

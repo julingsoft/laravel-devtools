@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace {$namespace}\Responses\{$name};
 
 use App\Http\Responses\PaginateLinkVo;
-use Juling\Foundation\Support\ArrayHelper;
+use App\Support\ArrayHelper;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(schema: '{$name}QueryResponse')]

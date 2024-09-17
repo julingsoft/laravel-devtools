@@ -41,7 +41,7 @@ class GenRoute extends Command
             $module = basename($dir);
             $files = array_merge(
                 glob($dir.'/Controllers/*Controller.php'),
-                glob(app_path('Bundles/*/API/'.$module.'/Controllers/*Controller.php'))
+                glob(app_path('Bundles/*/Controllers/'.$module.'/*Controller.php'))
             );
             $routes = $this->getRoutes($files);
             $this->genRoutes(Str::camel($module), $routes, $dir.'/Routes/api.php');

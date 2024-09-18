@@ -62,10 +62,13 @@ trait SchemaTrait
         if (in_array($type, ['varchar', 'char', 'text', 'mediumtext', 'longtext'])) {
             $type = 'string';
         }
-        if (in_array($type, ['decimal', 'float'])) {
+        if (in_array($type, ['decimal', 'float', 'double'])) {
             $type = 'float';
         }
         if (in_array($type, ['date', 'datetime', 'timestamp', 'time'])) {
+            $type = 'string';
+        }
+        if (! in_array($type, ['int', 'string', 'float'])) {
             $type = 'string';
         }
 

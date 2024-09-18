@@ -46,6 +46,12 @@ class GenEntity extends Command
 
         $fields = "\n";
         foreach ($columns as $column) {
+            $constName = Str::studly($column['name']);
+            $fields .= "    const get{$constName} = '{$column['name']}'; // {$column['comment']}\n";
+        }
+        $fields .= "\n";
+
+        foreach ($columns as $column) {
             if ($column['name'] === 'default') {
                 $column['name'] = 'isDefault';
             }

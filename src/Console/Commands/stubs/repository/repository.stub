@@ -22,7 +22,7 @@ class {$name}Repository extends CurdRepository implements RepositoryInterface
     public static function getInstance(): {$name}Repository
     {
         if (is_null(self::$instance)) {
-            self::$instance = new {$name}Repository();
+            self::$instance = new {$name}Repository;
         }
 
         return self::$instance;
@@ -33,7 +33,7 @@ class {$name}Repository extends CurdRepository implements RepositoryInterface
      */
     public function saveEntity({$name}Entity $entity): int
     {
-        return $this->save($entity->toArray());
+        return $this->save($entity->toEntity());
     }
 
     /**
@@ -46,10 +46,7 @@ class {$name}Repository extends CurdRepository implements RepositoryInterface
             return null;
         }
 
-        $entity = new {$name}Entity();
-        $entity->loadData($data);
-
-        return $entity;
+        return new {$name}Entity($data);
     }
 
     /**
@@ -62,10 +59,7 @@ class {$name}Repository extends CurdRepository implements RepositoryInterface
             return null;
         }
 
-        $entity = new {$name}Entity();
-        $entity->loadData($data);
-
-        return $entity;
+        return new {$name}Entity($data);
     }
 
     /**
@@ -81,6 +75,6 @@ class {$name}Repository extends CurdRepository implements RepositoryInterface
      */
     public function model(): Model
     {
-        return new {$name}();
+        return new {$name};
     }
 }

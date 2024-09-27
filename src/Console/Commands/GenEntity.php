@@ -46,9 +46,8 @@ class GenEntity extends Command
 
         $fields = "\n";
         foreach ($columns as $column) {
-            $fields .= "    const get{$column['studly_name']} = '{$column['name']}'; // {$column['comment']}\n";
+            $fields .= "    const get{$column['studly_name']} = '{$column['name']}'; // {$column['comment']}\n\n";
         }
-        $fields .= "\n";
 
         foreach ($columns as $column) {
             if ($column['name'] === 'default') {

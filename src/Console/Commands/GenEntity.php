@@ -46,8 +46,7 @@ class GenEntity extends Command
 
         $fields = "\n";
         foreach ($columns as $column) {
-            $constName = Str::studly($column['name']);
-            $fields .= "    const get{$constName} = '{$column['name']}'; // {$column['comment']}\n";
+            $fields .= "    const get{$column['studly_name']} = '{$column['name']}'; // {$column['comment']}\n";
         }
         $fields .= "\n";
 
@@ -67,12 +66,12 @@ class GenEntity extends Command
             if ($column['name'] === 'deleted_at' && empty($column['comment'])) {
                 $column['comment'] = '删除时间';
             }
-            $fields .= "    #[OA\\Property(property: '{$column['name']}', description: '{$column['comment']}', type: '{$column['swagger_type']}')]\n";
-            $fields .= '    private '.$column['base_type'].' $'.$column['name'].";\n\n";
+            $fields .= "    #[OA\\Property(property: '{$column['camel_name']}', description: '{$column['comment']}', type: '{$column['swagger_type']}')]\n";
+            $fields .= '    private '.$column['base_type'].' $'.$column['camel_name'].";\n\n";
         }
 
         foreach ($columns as $column) {
-            $fields .= $this->getSet($column['name'], $column['base_type'], $column['comment'])."\n\n";
+            $fields .= $this->getSet($column['camel_name'], $column['base_type'], $column['comment'])."\n\n";
         }
 
         $fields = rtrim($fields, "\n");

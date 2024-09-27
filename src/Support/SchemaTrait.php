@@ -43,6 +43,8 @@ trait SchemaTrait
         $columns = Schema::getColumns($tableName);
 
         foreach ($columns as $key => $row) {
+            $row['camel_name'] = Str::camel($row['name']);
+            $row['studly_name'] = Str::studly($row['name']);
             $row['base_type'] = $this->getFieldType($row['type_name']);
             $row['swagger_type'] = $row['base_type'] === 'int' ? 'integer' : $row['base_type'];
             $columns[$key] = $row;

@@ -68,7 +68,7 @@ class GenEntity extends Command
                 $column['comment'] = '删除时间';
             }
             $fields .= "    #[OA\\Property(property: '{$column['name']}', description: '{$column['comment']}', type: '{$column['swagger_type']}')]\n";
-            $fields .= '    protected '.$column['base_type'].' $'.$column['name'].";\n\n";
+            $fields .= '    private '.$column['base_type'].' $'.$column['name'].";\n\n";
         }
 
         foreach ($columns as $column) {

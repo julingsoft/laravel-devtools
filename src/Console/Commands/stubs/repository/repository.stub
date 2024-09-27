@@ -47,7 +47,7 @@ class {$name}Repository extends CurdRepository implements RepositoryInterface
         }
 
         $entity = new {$name}Entity();
-        $entity->setData($data);
+        $entity->loadData($data);
 
         return $entity;
     }
@@ -63,7 +63,7 @@ class {$name}Repository extends CurdRepository implements RepositoryInterface
         }
 
         $entity = new {$name}Entity();
-        $entity->setData($data);
+        $entity->loadData($data);
 
         return $entity;
     }

@@ -62,7 +62,7 @@ class {$name}Controller extends Controller
 
             foreach ($result['data'] as $key => $item) {
                 $response = new {$name}Response();
-                $response->setData($item);
+                $response->loadData($item);
                 $result['data'][$key] = $response->toArray();
             }
 
@@ -88,7 +88,7 @@ class {$name}Controller extends Controller
         DB::beginTransaction();
         try {
             $input = new {$name}Entity();
-            $input->setData($request);
+            $input->loadData($request);
 
             ${$camelName}Service = new {$name}Service();
             if (${$camelName}Service->save($input->toArray())) {
@@ -127,7 +127,7 @@ class {$name}Controller extends Controller
             }
 
             $response = new {$name}Response();
-            $response->setData(${$camelName});
+            $response->loadData(${$camelName});
 
             return $this->success($response->toArray());
         } catch (Throwable $e) {
@@ -159,7 +159,7 @@ class {$name}Controller extends Controller
             }
 
             $input = new {$name}Entity();
-            $input->setData($request);
+            $input->loadData($request);
 
             ${$camelName}Service->updateById($input->toArray(), $id);
 

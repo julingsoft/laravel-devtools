@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace {$namespace}\Responses\{$name};
 
 use App\Http\Responses\PaginateLinkVo;
-use App\Support\ArrayHelper;
+use App\Support\DTOHelper;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(schema: '{$name}QueryResponse')]
 class {$name}QueryResponse
 {
-    use ArrayHelper;
+    use DTOHelper;
 
     #[OA\Property(property: 'current_page', description: '当前页码', type: 'integer')]
     private int $current_page;

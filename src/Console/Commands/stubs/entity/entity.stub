@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Entities;
 
-use App\Support\ArrayHelper;
+use App\Support\DTOHelper;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(schema: '{{ name }}Entity')]
 class {{ name }}Entity
 {
-    use ArrayHelper;
+    use DTOHelper;
 {{ fields }}
 }

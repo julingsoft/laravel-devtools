@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace {$namespace}\Responses\{$name};
 
-use App\Support\ArrayHelper;
+use App\Support\DTOHelper;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(schema: '{$name}DestroyResponse')]
 class {$name}DestroyResponse
 {
-    use ArrayHelper;
+    use DTOHelper;
 
     #[OA\Property(property: 'status', description: '状态:1成功，2失败', type: 'integer')]
     private int $status;

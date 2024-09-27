@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace {$namespace}\Responses\{$name};
 
-use App\Support\ArrayHelper;
+use App\Support\DTOHelper;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(schema: '{$name}Response')]
 class {$name}Response
 {
-    use ArrayHelper;
+    use DTOHelper;
 {$fields}
 }

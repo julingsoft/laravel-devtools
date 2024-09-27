@@ -27,11 +27,13 @@ class InitCommand extends Command
     {
         $fs = new Filesystem();
 
+        $fs->ensureDirectoryExists(app_path('API'));
         $fs->ensureDirectoryExists(app_path('Bundles'));
         $fs->ensureDirectoryExists(app_path('Entities'));
         $fs->ensureDirectoryExists(app_path('Enums'));
         $fs->ensureDirectoryExists(app_path('Repositories'));
         $fs->ensureDirectoryExists(app_path('Services'));
+        $fs->ensureDirectoryExists(app_path('Support'));
 
         $fs->ensureDirectoryExists(storage_path('app/openapi'));
         $fs->ensureDirectoryExists(storage_path('app/ts/services'));

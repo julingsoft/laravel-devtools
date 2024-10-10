@@ -15,7 +15,6 @@ use {$namespace}\Responses\{$name}\{$name}DestroyResponse;
 use {$namespace}\Responses\{$name}\{$name}QueryResponse;
 use {$namespace}\Responses\{$name}\{$name}Response;
 use App\Services\{$name}Service;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,26 +22,8 @@ use Illuminate\Support\Facades\Log;
 use OpenApi\Attributes as OA;
 use Throwable;
 
-class {$name}Controller extends Controller
+class {$name}Controller extends BaseController
 {
-    #[OA\Get(path: '/{$camelName}', summary: '显示列表页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
-    public function index(): Renderable
-    {
-        return view('{$viewNamespace}::{$camelName}.index');
-    }
-
-    #[OA\Get(path: '/{$camelName}/create', summary: '新增表单页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
-    public function create(): Renderable
-    {
-        return view('{$viewNamespace}::{$camelName}.create');
-    }
-
-    #[OA\Get(path: '/{$camelName}/edit', summary: '编辑表单页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
-    public function edit(): Renderable
-    {
-        return view('{$viewNamespace}::{$camelName}.edit');
-    }
-
     #[OA\Post(path: '/{$camelName}/query', summary: '查询列表接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
     #[OA\Parameter(name: 'page', description: '当前页码', in: 'query', required: true, example: 1)]
     #[OA\Parameter(name: 'pageSize', description: '每页分页数', in: 'query', required: false, example: 10)]
@@ -57,12 +38,11 @@ class {$name}Controller extends Controller
         try {
             $condition = [];
 
-            ${$camelName}Service = new {$name}Service();
+            ${$camelName}Service = new {$name}Service;
             $result = ${$camelName}Service->page($condition, $page, $pageSize);
 
             foreach ($result['data'] as $key => $item) {
-                $response = new {$name}Response();
-                $response->loadData($item);
+                $response = new {$name}Response($item);
                 $result['data'][$key] = $response->toArray();
             }
 
@@ -87,10 +67,9 @@ class {$name}Controller extends Controller
 
         DB::beginTransaction();
         try {
-            $input = new {$name}Entity();
-            $input->loadData($request);
+            $input = new {$name}Entity($request);
 
-            ${$camelName}Service = new {$name}Service();
+            ${$camelName}Service = new {$name}Service;
             if (${$camelName}Service->save($input->toArray())) {
                 DB::commit();
 
@@ -119,15 +98,13 @@ class {$name}Controller extends Controller
         $id = intval($request->query('id', 0));
 
         try {
-            ${$camelName}Service = new {$name}Service();
-
+            ${$camelName}Service = new {$name}Service;
             ${$camelName} = ${$camelName}Service->getOneById($id);
             if (empty(${$camelName})) {
                 throw new CustomException(BusinessCodeEnum::NOT_FOUND);
             }
 
-            $response = new {$name}Response();
-            $response->loadData(${$camelName});
+            $response = new {$name}Response(${$camelName});
 
             return $this->success($response->toArray());
         } catch (Throwable $e) {
@@ -151,15 +128,13 @@ class {$name}Controller extends Controller
 
         DB::beginTransaction();
         try {
-            ${$camelName}Service = new {$name}Service();
-
+            ${$camelName}Service = new {$name}Service;
             ${$camelName} = ${$camelName}Service->getOneById($id);
             if (empty(${$camelName})) {
                 throw new CustomException(BusinessCodeEnum::NOT_FOUND);
             }
 
-            $input = new {$name}Entity();
-            $input->loadData($request);
+            $input = new {$name}Entity($request);
 
             ${$camelName}Service->updateById($input->toArray(), $id);
 
@@ -188,8 +163,7 @@ class {$name}Controller extends Controller
 
         DB::beginTransaction();
         try {
-            ${$camelName}Service = new {$name}Service();
-
+            ${$camelName}Service = new {$name}Service;
             ${$camelName} = ${$camelName}Service->getOneById($id);
             if (empty(${$camelName})) {
                 throw new CustomException(BusinessCodeEnum::NOT_FOUND);

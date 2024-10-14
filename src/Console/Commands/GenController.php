@@ -133,10 +133,10 @@ class GenController extends Command
     private function writeRequest($name, $suffix, $required, $properties, $consts, $rules, $messages): void
     {
         if ($suffix === 'UpdateRequest') {
-            $required = "        'id',\n".$required;
-            $properties = "        new OA\Property(property: 'id', description: 'ID', type: 'integer'),\n".$properties;
-            $rules = "            'id' => 'require',\n".$rules;
-            $messages = "            'id.require' => '请设置ID',\n".$messages;
+            $required = "        self::getId,\n".$required;
+            $properties = "        new OA\Property(property: self::getId, description: 'ID', type: 'integer'),\n".$properties;
+            $rules = "            self::getId => 'require',\n".$rules;
+            $messages = "            self::getId.'.require' => '请设置ID',\n".$messages;
         }
 
         $content = file_get_contents(__DIR__.'/stubs/request/request.stub');

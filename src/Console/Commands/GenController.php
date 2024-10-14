@@ -87,7 +87,7 @@ class GenController extends Command
 
         $ignoreFields = ['id', 'created_at', 'updated_at', 'deleted_at'];
 
-        $dataSets = ['required' => '', 'properties' => '', 'rule' => '', 'message' => ''];
+        $dataSets = ['required' => '', 'properties' => '', 'consts' => '', 'rules' => '', 'messages' => ''];
         foreach ($columns as $column) {
             if (in_array($column['name'], $ignoreFields)) {
                 continue;
@@ -107,34 +107,36 @@ class GenController extends Command
             if ($column['name'] === 'deleted_at' && empty($column['comment'])) {
                 $column['comment'] = '删除时间';
             }
-            $dataSets['required'] .= "        '".$column['name']."',\n";
-            $dataSets['properties'] .= "        new OA\Property(property: '{$column['name']}', description: '{$column['comment']}', type: '{$column['swagger_type']}'),\n";
-            $dataSets['rule'] .= "            '{$column['name']}' => 'require',\n";
+            $camelName = Str::studly($column['name']);
+            $dataSets['required'] .= "        self::get{$camelName},\n";
+            $dataSets['properties'] .= "        new OA\Property(property: self::get{$camelName}, description: '{$column['comment']}', type: '{$column['swagger_type']}'),\n";
+            $dataSets['consts'] .= "    const get{$camelName} = '{$column['name']}';\n\n";
+            $dataSets['rules'] .= "            self::get{$camelName} => 'require',\n";
 
             $column['comment'] = Str::replace([':', '：'], ':', $column['comment']);
             $endPosition = Str::position($column['comment'], ':');
             if ($endPosition !== false) {
                 $column['comment'] = Str::substr($column['comment'], 0, $endPosition);
             }
-            $dataSets['message'] .= "            '{$column['name']}.require' => '请设置{$column['comment']}',\n";
+            $dataSets['messages'] .= "            self::get{$camelName}.'.require' => '请设置{$column['comment']}',\n";
         }
 
         $dataSets = array_map(function ($item) {
             return rtrim($item, "\n");
         }, $dataSets);
 
-        $this->writeRequest($name, 'CreateRequest', $dataSets['required'], $dataSets['properties'], $dataSets['rule'], $dataSets['message']);
-        $this->writeRequest($name, 'QueryRequest', '', '', '', '');
-        $this->writeRequest($name, 'UpdateRequest', $dataSets['required'], $dataSets['properties'], $dataSets['rule'], $dataSets['message']);
+        $this->writeRequest($name, 'CreateRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages']);
+        $this->writeRequest($name, 'QueryRequest', '', '', '', '', '');
+        $this->writeRequest($name, 'UpdateRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages']);
     }
 
-    private function writeRequest($name, $suffix, $required, $properties, $rule, $message): void
+    private function writeRequest($name, $suffix, $required, $properties, $consts, $rules, $messages): void
     {
         if ($suffix === 'UpdateRequest') {
             $required = "        'id',\n".$required;
             $properties = "        new OA\Property(property: 'id', description: 'ID', type: 'integer'),\n".$properties;
-            $rule = "            'id' => 'require',\n".$rule;
-            $message = "            'id.require' => '请设置ID',\n".$message;
+            $rules = "            'id' => 'require',\n".$rules;
+            $messages = "            'id.require' => '请设置ID',\n".$messages;
         }
 
         $content = file_get_contents(__DIR__.'/stubs/request/request.stub');
@@ -143,16 +145,18 @@ class GenController extends Command
             '{$schema}',
             '{$dataSets[required]}',
             '{$dataSets[properties]}',
-            '{$dataSets[rule]}',
-            '{$dataSets[message]}',
+            '{$dataSets[consts]}',
+            '{$dataSets[rules]}',
+            '{$dataSets[messages]}',
             '{$namespace}',
         ], [
             $name,
             $name.$suffix,
             $required,
             $properties,
-            $rule,
-            $message,
+            $consts,
+            $rules,
+            $messages,
             config('devtools.namespace'),
         ], $content);
         file_put_contents(config('devtools.dist').'/Requests/'.$name.'/'.$name.$suffix.'.php', $content);

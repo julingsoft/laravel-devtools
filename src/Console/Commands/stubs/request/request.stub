@@ -18,27 +18,19 @@ use OpenApi\Attributes as OA;
 )]
 class {$schema} extends FormRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+{$dataSets[consts]}
+
     public function rules(): array
     {
         return [
-{$dataSets[rule]}
+{$dataSets[rules]}
         ];
     }
 
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array
-     */
-    public function messages()
+    public function messages(): array
     {
         return [
-{$dataSets[message]}
+{$dataSets[messages]}
         ];
     }
 }

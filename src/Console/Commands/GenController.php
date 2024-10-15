@@ -135,6 +135,7 @@ class GenController extends Command
         if ($suffix === 'UpdateRequest') {
             $required = "        self::getId,\n".$required;
             $properties = "        new OA\Property(property: self::getId, description: 'ID', type: 'integer'),\n".$properties;
+            $consts = "    const getId = 'id';\n\n".$consts;
             $rules = "            self::getId => 'require',\n".$rules;
             $messages = "            self::getId.'.require' => '请设置ID',\n".$messages;
         }

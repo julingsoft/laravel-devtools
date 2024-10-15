@@ -110,7 +110,7 @@ class GenController extends Command
             $camelName = Str::studly($column['name']);
             $dataSets['required'] .= "        self::get{$camelName},\n";
             $dataSets['properties'] .= "        new OA\Property(property: self::get{$camelName}, description: '{$column['comment']}', type: '{$column['swagger_type']}'),\n";
-            $dataSets['consts'] .= "    const get{$camelName} = '{$column['name']}';\n\n";
+            $dataSets['consts'] .= "    const string get{$camelName} = '{$column['name']}';\n\n";
             $dataSets['rules'] .= "            self::get{$camelName} => 'require',\n";
 
             $column['comment'] = Str::replace([':', '：'], ':', $column['comment']);
@@ -135,7 +135,7 @@ class GenController extends Command
         if ($suffix === 'UpdateRequest') {
             $required = "        self::getId,\n".$required;
             $properties = "        new OA\Property(property: self::getId, description: 'ID', type: 'integer'),\n".$properties;
-            $consts = "    const getId = 'id';\n\n".$consts;
+            $consts = "    const string getId = 'id';\n\n".$consts;
             $rules = "            self::getId => 'require',\n".$rules;
             $messages = "            self::getId.'.require' => '请设置ID',\n".$messages;
         }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\SchemaTrait;
@@ -85,7 +84,7 @@ class GenEntity extends Command
             ->ext('php')
             ->replaces([
                 'name' => $className,
-                'fields' => $fields
+                'fields' => $fields,
             ])
             ->generate();
     }

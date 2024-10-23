@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Juling\DevTools\Support;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -102,7 +101,7 @@ EOF;
 
     private function ensureDirectoryExists(array|string $dirs): void
     {
-        $fs = new Filesystem();
+        $fs = new Filesystem;
 
         if (is_string($dirs)) {
             $dirs = [$dirs];
@@ -115,7 +114,7 @@ EOF;
 
     private function deleteDirectories(string $directory): void
     {
-        $fs = new Filesystem();
+        $fs = new Filesystem;
 
         $fs->deleteDirectories($directory);
     }

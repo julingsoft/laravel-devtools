@@ -25,7 +25,7 @@ class InitCommand extends Command
 
     public function handle(): void
     {
-        $fs = new Filesystem();
+        $fs = new Filesystem;
 
         $fs->ensureDirectoryExists(app_path('API'));
         $fs->ensureDirectoryExists(app_path('Bundles'));

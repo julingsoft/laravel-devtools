@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Enums\{$name};
 
-use App\Foundation\Contracts\EnumMethodInterface;
-use App\Support\EnumMethods;
+use Juling\Foundation\Contracts\EnumMethodInterface;
+use Juling\Foundation\Support\EnumMethods;
 
 /**
  * {$comment}枚举

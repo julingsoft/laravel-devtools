@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace {$namespace}\Controllers;
 
 use App\Entities\{$name}Entity;
-use App\Enums\CodeEnum;
-use App\Exceptions\CustomException;
-use App\Http\Controllers\Controller;
 use {$namespace}\Requests\{$name}\{$name}CreateRequest;
 use {$namespace}\Requests\{$name}\{$name}QueryRequest;
 use {$namespace}\Requests\{$name}\{$name}UpdateRequest;
@@ -19,6 +16,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Juling\Foundation\Enums\BusinessEnum;
+use Juling\Foundation\Exceptions\BusinessException;
 use OpenApi\Attributes as OA;
 use Throwable;
 
@@ -48,13 +47,13 @@ class {$name}Controller extends BaseController
 
             return $this->success($result);
         } catch (Throwable $e) {
-            if ($e instanceof CustomException) {
+            if ($e instanceof BusinessException) {
                 return $this->error($e);
             }
 
             Log::error($e);
 
-            return $this->error(CodeEnum::QUERY_ERROR);
+            return $this->error(BusinessEnum::QUERY_ERROR);
         }
     }
 
@@ -76,17 +75,17 @@ class {$name}Controller extends BaseController
                 return $this->success();
             }
 
-            throw new CustomException(CodeEnum::CREATE_FAIL);
+            throw new BusinessException(BusinessEnum::CREATE_FAIL);
         } catch (Throwable $e) {
             DB::rollBack();
 
-            if ($e instanceof CustomException) {
+            if ($e instanceof BusinessException) {
                 return $this->error($e);
             }
 
             Log::error($e);
 
-            return $this->error(CodeEnum::CREATE_ERROR);
+            return $this->error(BusinessEnum::CREATE_ERROR);
         }
     }
 
@@ -101,20 +100,20 @@ class {$name}Controller extends BaseController
             ${$camelName}Service = new {$name}Service;
             ${$camelName} = ${$camelName}Service->getOneById($id);
             if (empty(${$camelName})) {
-                throw new CustomException(CodeEnum::NOT_FOUND);
+                throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
             $response = new {$name}Response(${$camelName});
 
             return $this->success($response->toArray());
         } catch (Throwable $e) {
-            if ($e instanceof CustomException) {
+            if ($e instanceof BusinessException) {
                 return $this->error($e);
             }
 
             Log::error($e);
 
-            return $this->error(CodeEnum::SHOW_ERROR);
+            return $this->error(BusinessEnum::SHOW_ERROR);
         }
     }
 
@@ -131,7 +130,7 @@ class {$name}Controller extends BaseController
             ${$camelName}Service = new {$name}Service;
             ${$camelName} = ${$camelName}Service->getOneById($id);
             if (empty(${$camelName})) {
-                throw new CustomException(CodeEnum::NOT_FOUND);
+                throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
             $input = new {$name}Entity($request);
@@ -144,13 +143,13 @@ class {$name}Controller extends BaseController
         } catch (Throwable $e) {
             DB::rollBack();
 
-            if ($e instanceof CustomException) {
+            if ($e instanceof BusinessException) {
                 return $this->error($e);
             }
 
             Log::error($e);
 
-            return $this->error(CodeEnum::UPDATE_ERROR);
+            return $this->error(BusinessEnum::UPDATE_ERROR);
         }
     }
 
@@ -166,7 +165,7 @@ class {$name}Controller extends BaseController
             ${$camelName}Service = new {$name}Service;
             ${$camelName} = ${$camelName}Service->getOneById($id);
             if (empty(${$camelName})) {
-                throw new CustomException(CodeEnum::NOT_FOUND);
+                throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
             if (${$camelName}Service->removeById($id)) {
@@ -175,17 +174,17 @@ class {$name}Controller extends BaseController
                 return $this->success();
             }
 
-            throw new CustomException(CodeEnum::DESTROY_FAIL);
+            throw new BusinessException(BusinessEnum::DESTROY_FAIL);
         } catch (Throwable $e) {
             DB::rollBack();
 
-            if ($e instanceof CustomException) {
+            if ($e instanceof BusinessException) {
                 return $this->error($e);
             }
 
             Log::error($e);
 
-            return $this->error(CodeEnum::DESTROY_ERROR);
+            return $this->error(BusinessEnum::DESTROY_ERROR);
         }
     }
 }

@@ -2,12 +2,12 @@
     "name": "juling/laravel-devtools",
     "license": "Apache-2.0",
     "require": {
-        "php": "^8.2",
-        "laravel/framework": "^11.0"
+        "php": "^8.3",
+        "laravel/framework": "^11.29"
     },
     "require-dev": {
-        "laravel/pint": "^1.14",
-        "phpstan/phpstan": "^1.10"
+        "laravel/pint": "^1.18",
+        "phpstan/phpstan": "^1.12"
     },
     "autoload": {
         "psr-4": {

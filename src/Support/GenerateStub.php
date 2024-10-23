@@ -12,43 +12,31 @@ class GenerateStub
 {
     /**
      * Stub path.
-     *
-     * @var string
      */
     protected string $from;
 
     /**
      * Stub destination path.
-     *
-     * @var string
      */
     protected string $to;
 
     /**
      * The new name of stub file.
-     *
-     * @var string
      */
     protected string $name;
 
     /**
      * The stub extension.
-     *
-     * @var string|null
      */
-    protected string|null $ext;
+    protected ?string $ext;
 
     /**
      * The list of replaces.
-     *
-     * @var array
      */
     protected array $replaces;
 
     /**
      * The stub file move or not.
-     *
-     * @var bool
      */
     protected bool $moveStub = false;
 
@@ -185,5 +173,5 @@ class GenerateStub
         }
 
         return $path;
-    }    
+    }
 }

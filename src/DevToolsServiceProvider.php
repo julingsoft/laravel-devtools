@@ -25,7 +25,7 @@ class DevToolsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(dirname(__DIR__) . '/config/devtools.php', 'devtools');
+        $this->mergeConfigFrom(dirname(__DIR__).'/config/devtools.php', 'devtools');
     }
 
     /**

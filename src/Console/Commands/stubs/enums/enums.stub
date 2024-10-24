@@ -10,8 +10,7 @@ use Juling\Foundation\Support\EnumMethods;
 /**
  * {$comment}枚举
  */
-enum {$name}Enum: int implements EnumMethodInterface
+enum {$name}Enum: {$enumsType} implements EnumMethodInterface
 {
-    use EnumMethods;
-{$enums}
+    use EnumMethods;{$enums}
 }

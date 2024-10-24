@@ -72,16 +72,21 @@ class GenEnums extends Command
                 }, $enumsOptions);
 
                 $enums = '';
+                $enumsType = 'int';
                 foreach ($enumsOptions as $enumOption) {
                     $caseName = $enumsClass.$enumOption[0];
                     $caseVal = $enumOption[0];
-                    $tmp = <<<EOF
+                    $enums .= <<<EOF
+
 
     /**
      * $enumOption[1]
      */
     case $caseName = $caseVal;
 EOF;
+                    if (! is_numeric($caseVal)) {
+                        $enumsType = 'string';
+                    }
                 }
 
                 $className = $className.$enumsClass;
@@ -93,11 +98,13 @@ EOF;
                         '{$name}',
                         '{$comment}',
                         '{$enums}',
+                        '{$enumsType}',
                     ], [
                         $groupName,
                         $className,
                         $enumsName,
                         $enums,
+                        $enumsType,
                     ], $content);
                     file_put_contents($enumsFile, $content);
                 }

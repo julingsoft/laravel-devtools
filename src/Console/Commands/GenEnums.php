@@ -90,8 +90,8 @@ EOF;
                 }
 
                 $className = $className.$enumsClass;
-                $enumsFile = app_path('Bundles/'.$groupName.'/Enums/'.$className.'Enums.php');
-                if (! file_exists($enumsFile)) {
+                $enumFile = app_path('Bundles/'.$groupName.'/Enums/'.$className.'Enum.php');
+                if (! file_exists($enumFile)) {
                     $content = file_get_contents(__DIR__.'/stubs/enums/enums.stub');
                     $content = str_replace([
                         '{$group}',
@@ -106,7 +106,7 @@ EOF;
                         $enums,
                         $enumsType,
                     ], $content);
-                    file_put_contents($enumsFile, $content);
+                    file_put_contents($enumFile, $content);
                 }
             }
         }

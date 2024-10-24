@@ -52,6 +52,13 @@ trait SchemaTrait
         return $columns;
     }
 
+    private function getTableGroupName(string $tableName): string
+    {
+        $groups = explode('_', $tableName);
+
+        return Str::studly(Str::singular($groups[0]));
+    }
+
     private function getFieldType($type): string
     {
         preg_match('/(\w+)\(/', $type, $m);

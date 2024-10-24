@@ -1,0 +1,12 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Bundles\{$group}\Services;
+
+use App\Services\{$name}Service;
+
+class {$name}BundleService extends {$name}Service
+{
+    // 
+}

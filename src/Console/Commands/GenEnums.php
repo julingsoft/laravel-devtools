@@ -33,55 +33,75 @@ class GenEnums extends Command
     {
         $tables = $this->getTables();
         foreach ($tables as $key => $table) {
-            $className = Str::studly(Str::singular($table['name']));
+            $groupName = $this->getTableGroupName($table['name']);
             $comment = $table['comment'];
             if (Str::endsWith($comment, '表')) {
                 $comment = Str::substr($comment, 0, -1);
             }
             $comment .= '模块';
-            $this->enumsTpl($className, $comment);
-            $this->errorTpl($className, $comment, $key + 101);
+
+            $this->enumsTpl($groupName, $table['name'], $comment);
         }
     }
 
-    public function enumsTpl(string $name, string $comment): void
+    public function enumsTpl(string $groupName, string $tableName, string $comment): void
     {
-        $dist = app_path('Enums/'.$name);
+        $dist = app_path('Bundles/'.$groupName.'/Enums');
         if (! is_dir($dist)) {
             $this->ensureDirectoryExists($dist);
         }
 
-        $content = file_get_contents(__DIR__.'/stubs/enums/status.stub');
-        $content = str_replace([
-            '{$name}',
-            '{$comment}',
-        ], [
-            $name,
-            $comment,
-        ], $content);
-        file_put_contents(app_path('Enums/'.$name.'/'.$name.'StatusEnum.php'), $content);
-    }
+        $className = Str::studly(Str::singular($tableName));
+        $columns = $this->getTableColumns($tableName);
+        foreach ($columns as $column) {
+            if ($column['type'] === 'enum' || $column['type_name'] === 'tinyint') {
+                $enumsClass = Str::studly(Str::singular($column['name']));
+                $comment = Str::replace('：', ':', $column['comment']);
+                $comment = Str::replace('，', ',', $comment);
+                [$enumsName, $enumsOptions] = explode(':', $comment);
 
-    private function errorTpl(string $name, string $comment, int $index): void
-    {
-        $dist = app_path('Enums/'.$name);
-        if (! is_dir($dist)) {
-            $this->ensureDirectoryExists($dist);
-        }
+                $enumsOptions = explode(',', $enumsOptions);
+                $enumsOptions = array_map(function ($enumsOption) {
+                    if (Str::contains($enumsOption, '-')) {
+                        return explode('-', $enumsOption);
+                    } else {
+                        preg_match('/^(\d+)(.*)$/', $enumsOption, $matches);
 
-        $errorEnumsFile = app_path('Enums/'.$name.'/'.$name.'ErrorEnum.php');
-        if (! file_exists($errorEnumsFile)) {
-            $content = file_get_contents(__DIR__.'/stubs/enums/error.stub');
-            $content = str_replace([
-                '{$name}',
-                '{$comment}',
-                '{$index}',
-            ], [
-                $name,
-                $comment,
-                $index,
-            ], $content);
-            file_put_contents($errorEnumsFile, $content);
+                        return [$matches[1], $matches[2]];
+                    }
+                }, $enumsOptions);
+
+                $enums = '';
+                foreach ($enumsOptions as $enumOption) {
+                    $caseName = $enumsClass.$enumOption[0];
+                    $caseVal = $enumOption[0];
+                    $tmp = <<<EOF
+
+    /**
+     * $enumOption[1]
+     */
+    case $caseName = $caseVal;
+EOF;
+                }
+
+                $className = $className.$enumsClass;
+                $enumsFile = app_path('Bundles/'.$groupName.'/Enums/'.$className.'Enums.php');
+                if (! file_exists($enumsFile)) {
+                    $content = file_get_contents(__DIR__.'/stubs/enums/enums.stub');
+                    $content = str_replace([
+                        '{$group}',
+                        '{$name}',
+                        '{$comment}',
+                        '{$enums}',
+                    ], [
+                        $groupName,
+                        $className,
+                        $enumsName,
+                        $enums,
+                    ], $content);
+                    file_put_contents($enumsFile, $content);
+                }
+            }
         }
     }
 }

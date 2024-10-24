@@ -44,7 +44,7 @@ class DevToolsServiceProvider extends ServiceProvider
                 GenController::class,
                 GenDict::class,
                 GenEntity::class,
-                // GenEnums::class,
+                GenEnums::class,
                 GenModel::class,
                 GenRepository::class,
                 GenRoute::class,

@@ -1,0 +1,17 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Bundles\{$group}\Enums;
+
+use Juling\Foundation\Contracts\EnumMethodInterface;
+use Juling\Foundation\Support\EnumMethods;
+
+/**
+ * {$comment}枚举
+ */
+enum {$name}Enum: int implements EnumMethodInterface
+{
+    use EnumMethods;
+{$enums}
+}

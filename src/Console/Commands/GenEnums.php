@@ -51,11 +51,11 @@ class GenEnums extends Command
             $this->ensureDirectoryExists($dist);
         }
 
-        $className = Str::studly(Str::singular($tableName));
+        $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
         foreach ($columns as $column) {
             if ($column['type'] === 'enum' || $column['type_name'] === 'tinyint') {
-                $enumsClass = Str::studly(Str::singular($column['name']));
+                $enumsClass = Str::studly($this->getSingular($column['name']));
                 $comment = Str::replace('：', ':', $column['comment']);
                 $comment = Str::replace('，', ',', $comment);
                 [$enumsName, $enumsOptions] = explode(':', $comment);

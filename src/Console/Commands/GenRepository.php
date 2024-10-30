@@ -39,7 +39,7 @@ class GenRepository extends Command
 
     private function repositoryTpl(string $tableName): void
     {
-        $className = Str::studly(Str::singular($tableName));
+        $className = Str::studly($this->getSingular($tableName));
 
         $content = file_get_contents(__DIR__.'/stubs/repository/repository.stub');
         $content = str_replace([

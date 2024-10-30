@@ -22,6 +22,8 @@ trait SchemaTrait
         'sessions',
     ];
 
+    private array $ignoreSingles = [];
+
     private function getTables(): array
     {
         $this->ignoreTables = array_merge($this->ignoreTables, config('devtools.ignore_tables', []));
@@ -56,7 +58,20 @@ trait SchemaTrait
     {
         $groups = explode('_', $tableName);
 
-        return Str::studly(Str::singular($groups[0]));
+        return Str::studly($this->getSingular($groups[0]));
+    }
+
+    private function getSingular(string $name): string
+    {
+        $this->ignoreSingles = array_merge($this->ignoreSingles, config('devtools.ignore_singles', []));
+
+        foreach ($this->ignoreSingles as $item) {
+            if (Str::endsWith($name, $item)) {
+                return $name;
+            }
+        }
+
+        return Str::singular($name);
     }
 
     private function getFieldType($type): string

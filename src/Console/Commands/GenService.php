@@ -33,7 +33,7 @@ class GenService extends Command
     {
         $tables = $this->getTables();
         foreach ($tables as $table) {
-            $className = Str::studly(Str::singular($table['name']));
+            $className = Str::studly($this->getSingular($table['name']));
             $this->serviceTpl($className);
             $this->bundleTpl($table['name'], $className);
         }

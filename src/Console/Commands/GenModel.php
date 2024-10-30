@@ -46,7 +46,7 @@ class GenModel extends Command
 
     private function modelTpl(string $tableName): void
     {
-        $className = Str::studly(Str::singular($tableName));
+        $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
 
         $softDelete = false;

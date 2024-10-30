@@ -40,7 +40,7 @@ class GenEntity extends Command
 
     private function entityTpl(string $tableName): void
     {
-        $className = Str::studly(Str::singular($tableName));
+        $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
 
         $fields = "\n";

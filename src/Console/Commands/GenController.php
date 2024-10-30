@@ -40,7 +40,7 @@ class GenController extends Command
 
         $tables = $this->getTables();
         foreach ($tables as $table) {
-            $className = Str::studly(Str::singular($table['name']));
+            $className = Str::studly($this->getSingular($table['name']));
             $comment = $table['comment'];
             if (Str::endsWith($comment, '表')) {
                 $comment = Str::substr($comment, 0, -1);

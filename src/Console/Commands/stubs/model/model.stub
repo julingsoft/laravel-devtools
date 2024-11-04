@@ -20,7 +20,7 @@ class {$name} extends Model
      *
      * @var string
      */
-    protected $primaryKey = '$primaryKey';
+    protected $primaryKey = '$pk';
 
     /**
      * The attributes that are mass assignable.

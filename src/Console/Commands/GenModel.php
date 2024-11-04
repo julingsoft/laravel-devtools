@@ -48,13 +48,13 @@ class GenModel extends Command
         $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
         $primaryKey = $this->getTablePrimaryKey($tableName);
-        $this->ignoreColumns[] = $primaryKey;
+        $ignoreColumns = array_merge($this->ignoreColumns, [$primaryKey]);
 
         $softDelete = false;
 
         $fieldStr = '';
         foreach ($columns as $column) {
-            if (! in_array($column['name'], $this->ignoreColumns)) {
+            if (! in_array($column['name'], $ignoreColumns)) {
                 $fieldStr .= str_pad(' ', 8)."'{$column['name']}',\n";
             }
             if ($column['name'] === 'deleted_at') {
@@ -72,7 +72,7 @@ class GenModel extends Command
         $content = str_replace([
             '{$name}',
             '$tableName',
-            '$primaryKey',
+            '$pk',
             '$useSoftDelete',
             '$fieldStr',
         ], [

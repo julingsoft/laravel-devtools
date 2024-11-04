@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Juling\DevTools\Support;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -57,15 +57,17 @@ trait SchemaTrait
 
     private function getTablePrimaryKey($tableName): string
     {
-        $indexes = Schema::getIndexes($tableName);
+        $columns = DB::select("SHOW KEYS FROM $tableName WHERE Key_name = 'PRIMARY'");
 
-        foreach ($indexes as $index) {
-            if ($index['primary']) {
-                return Arr::first($index['columns']);
+        $primaryKey = 'id';
+        foreach ($columns as $column) {
+            if ($column->Key_name == 'PRIMARY') {
+                $primaryKey = $column->Column_name;
+                break;
             }
         }
 
-        return 'id';
+        return $primaryKey;
     }
 
     private function getTableGroupName(string $tableName): string

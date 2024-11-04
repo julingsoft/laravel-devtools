@@ -16,6 +16,13 @@ class {$name} extends Model
     protected $table = '$tableName';
 
     /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = '$primaryKey';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>

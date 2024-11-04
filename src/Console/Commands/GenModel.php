@@ -27,7 +27,6 @@ class GenModel extends Command
     protected $description = 'Generate model classes';
 
     private array $ignoreColumns = [
-        'id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -48,6 +47,8 @@ class GenModel extends Command
     {
         $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
+        $primaryKey = $this->getTablePrimaryKey($tableName);
+        $this->ignoreColumns[] = $primaryKey;
 
         $softDelete = false;
 
@@ -71,11 +72,13 @@ class GenModel extends Command
         $content = str_replace([
             '{$name}',
             '$tableName',
+            '$primaryKey',
             '$useSoftDelete',
             '$fieldStr',
         ], [
             $className,
             $tableName,
+            $primaryKey,
             $useSoftDelete,
             $fieldStr,
         ], $content);

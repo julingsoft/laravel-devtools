@@ -85,7 +85,7 @@ class GenController extends Command
             $this->ensureDirectoryExists($distDir);
         }
 
-        $ignoreFields = ['id', 'created_at', 'updated_at', 'deleted_at'];
+        $ignoreFields = ['created_at', 'updated_at', 'deleted_at'];
 
         $dataSets = ['required' => '', 'properties' => '', 'consts' => '', 'rules' => '', 'messages' => ''];
         foreach ($columns as $column) {

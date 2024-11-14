@@ -23,7 +23,7 @@ trait SchemaTrait
         'sessions',
     ];
 
-    private array $ignoreSingles = [];
+    private bool $ignoreSingular = true;
 
     private function getTables(): array
     {
@@ -79,12 +79,10 @@ trait SchemaTrait
 
     private function getSingular(string $name): string
     {
-        $this->ignoreSingles = array_merge($this->ignoreSingles, config('devtools.ignore_singles', []));
+        $this->ignoreSingular = config('devtools.ignore_singular', $this->ignoreSingular);
 
-        foreach ($this->ignoreSingles as $item) {
-            if (Str::endsWith($name, $item)) {
-                return $name;
-            }
+        if ($this->ignoreSingular) {
+            return $name;
         }
 
         return Str::singular($name);

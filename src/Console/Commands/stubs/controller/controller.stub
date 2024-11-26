@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace {$namespace}\Controllers;
 
+use App\Bundles\{$name}\{$name}BundleService;
 use App\Entities\{$name}Entity;
 use {$namespace}\Requests\{$name}\{$name}CreateRequest;
 use {$namespace}\Requests\{$name}\{$name}QueryRequest;
@@ -11,7 +12,6 @@ use {$namespace}\Requests\{$name}\{$name}UpdateRequest;
 use {$namespace}\Responses\{$name}\{$name}DestroyResponse;
 use {$namespace}\Responses\{$name}\{$name}QueryResponse;
 use {$namespace}\Responses\{$name}\{$name}Response;
-use App\Services\{$name}Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -37,8 +37,8 @@ class {$name}Controller extends BaseController
         try {
             $condition = [];
 
-            ${$camelName}Service = new {$name}Service;
-            $result = ${$camelName}Service->page($condition, $page, $pageSize);
+            ${$camelName}BundleService = new {$name}BundleService;
+            $result = ${$camelName}BundleService->page($condition, $page, $pageSize);
 
             foreach ($result['data'] as $key => $item) {
                 $response = new {$name}Response($item);
@@ -68,8 +68,8 @@ class {$name}Controller extends BaseController
         try {
             $input = new {$name}Entity($request);
 
-            ${$camelName}Service = new {$name}Service;
-            if (${$camelName}Service->save($input->toArray())) {
+            ${$camelName}BundleService = new {$name}BundleService;
+            if (${$camelName}BundleService->save($input->toArray())) {
                 DB::commit();
 
                 return $this->success();
@@ -97,8 +97,8 @@ class {$name}Controller extends BaseController
         $id = intval($request->query('id', 0));
 
         try {
-            ${$camelName}Service = new {$name}Service;
-            ${$camelName} = ${$camelName}Service->getOneById($id);
+            ${$camelName}BundleService = new {$name}BundleService;
+            ${$camelName} = ${$camelName}BundleService->getOneById($id);
             if (empty(${$camelName})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
@@ -127,15 +127,15 @@ class {$name}Controller extends BaseController
 
         DB::beginTransaction();
         try {
-            ${$camelName}Service = new {$name}Service;
-            ${$camelName} = ${$camelName}Service->getOneById($id);
+            ${$camelName}BundleService = new {$name}BundleService;
+            ${$camelName} = ${$camelName}BundleService->getOneById($id);
             if (empty(${$camelName})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
             $input = new {$name}Entity($request);
 
-            ${$camelName}Service->updateById($input->toArray(), $id);
+            ${$camelName}BundleService->updateById($input->toArray(), $id);
 
             DB::commit();
 
@@ -162,13 +162,13 @@ class {$name}Controller extends BaseController
 
         DB::beginTransaction();
         try {
-            ${$camelName}Service = new {$name}Service;
-            ${$camelName} = ${$camelName}Service->getOneById($id);
+            ${$camelName}BundleService = new {$name}BundleService;
+            ${$camelName} = ${$camelName}BundleService->getOneById($id);
             if (empty(${$camelName})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
-            if (${$camelName}Service->removeById($id)) {
+            if (${$camelName}BundleService->removeById($id)) {
                 DB::commit();
 
                 return $this->success();

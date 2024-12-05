@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace {$namespace}\Controllers;
 
-use App\Bundles\{$name}\{$name}BundleService;
+use App\Bundles\{$bundleName}\Services\{$name}BundleService;
 use App\Entities\{$name}Entity;
 use {$namespace}\Requests\{$name}\{$name}QueryRequest;
 use {$namespace}\Requests\{$name}\{$name}UpsertRequest;
 use {$namespace}\Responses\{$name}\{$name}DestroyResponse;
 use {$namespace}\Responses\{$name}\{$name}QueryResponse;
 use {$namespace}\Responses\{$name}\{$name}Response;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,27 @@ use Throwable;
 
 class {$name}Controller extends BaseController
 {
+    #[OA\Get(path: '/{$camelName}', summary: '显示列表页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Response(response: 200, description: 'OK')]
+    public function index(Request $request): Renderable
+    {
+        return $this->display('{$camelName}.index');
+    }
+
+    #[OA\Get(path: '/{$camelName}/create', summary: '显示新增页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Response(response: 200, description: 'OK')]
+    public function create(Request $request): Renderable
+    {
+        return $this->display('{$camelName}.create');
+    }
+
+    #[OA\Get(path: '/{$camelName}/edit', summary: '显示编辑页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Response(response: 200, description: 'OK')]
+    public function edit(Request $request): Renderable
+    {
+        return $this->display('{$camelName}.edit');
+    }
+
     #[OA\Post(path: '/{$camelName}/query', summary: '查询列表接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
     #[OA\Parameter(name: 'page', description: '当前页码', in: 'query', required: true, example: 1)]
     #[OA\Parameter(name: 'pageSize', description: '每页分页数', in: 'query', required: false, example: 10)]

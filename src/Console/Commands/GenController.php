@@ -61,15 +61,18 @@ class GenController extends Command
             $this->ensureDirectoryExists($distDir);
         }
 
+        $bundleName = $this->getTableGroupName(Str::snake($name));
         $content = file_get_contents(__DIR__.'/stubs/controller/controller.stub');
         $content = str_replace([
             '{$name}',
+            '{$bundleName}',
             '{$camelName}',
             '{$comment}',
             '{$namespace}',
             '{$viewNamespace}',
         ], [
             $name,
+            $bundleName,
             Str::camel($name),
             $comment,
             config('devtools.namespace'),

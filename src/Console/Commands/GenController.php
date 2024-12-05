@@ -125,21 +125,12 @@ class GenController extends Command
             return rtrim($item, "\n");
         }, $dataSets);
 
-        $this->writeRequest($name, 'CreateRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages']);
         $this->writeRequest($name, 'QueryRequest', '', '', '', '', '');
-        $this->writeRequest($name, 'UpdateRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages']);
+        $this->writeRequest($name, 'UpsertRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages']);
     }
 
     private function writeRequest($name, $suffix, $required, $properties, $consts, $rules, $messages): void
     {
-        if ($suffix === 'UpdateRequest') {
-            $required = "        self::getId,\n".$required;
-            $properties = "        new OA\Property(property: self::getId, description: 'ID', type: 'integer'),\n".$properties;
-            $consts = "    const string getId = 'id';\n\n".$consts;
-            $rules = "            self::getId => 'require',\n".$rules;
-            $messages = "            self::getId.'.require' => '请设置ID',\n".$messages;
-        }
-
         $content = file_get_contents(__DIR__.'/stubs/request/request.stub');
         $content = str_replace([
             '{$name}',

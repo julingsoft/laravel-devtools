@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace {$namespace}\Responses\{$name};
+namespace App\Modules\{{ groupName }}\Responses\{{ name }};
 
 use Juling\Foundation\Http\Responses\PaginateLinkVo;
 use Juling\Foundation\Support\DTOHelper;
 use OpenApi\Attributes as OA;
 
-#[OA\Schema(schema: '{$name}QueryResponse')]
-class {$name}QueryResponse
+#[OA\Schema(schema: '{{ name }}QueryResponse')]
+class {{ name }}QueryResponse
 {
     use DTOHelper;
 
     #[OA\Property(property: 'current_page', description: '当前页码', type: 'integer')]
     private int $current_page;
 
-    #[OA\Property(property: 'data', description: '数据列表', type: 'array', items: new OA\Items(ref: {$name}Response::class))]
+    #[OA\Property(property: 'data', description: '数据列表', type: 'array', items: new OA\Items(ref: {{ name }}Response::class))]
     private array $data;
 
     #[OA\Property(property: 'first_page_url', description: '首页URL', type: 'string')]

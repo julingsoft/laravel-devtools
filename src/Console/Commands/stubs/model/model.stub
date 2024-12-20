@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Models;
+namespace App\Models\{{ groupName }};
 
 use Illuminate\Database\Eloquent\Model;
 
-class {$name} extends Model
+class {{ name }} extends Model
 {
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = '$tableName';
+    protected $table = '{{ tableName }}';
 
     /**
      * The primary key for the model.
      *
      * @var string
      */
-    protected $primaryKey = '$pk';
+    protected $primaryKey = '{{ pk }}';
 
     /**
      * The attributes that are mass assignable.
@@ -28,6 +28,6 @@ class {$name} extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-$fieldStr
+{{ fieldStr }}
     ];
 }

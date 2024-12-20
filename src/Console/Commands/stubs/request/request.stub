@@ -2,35 +2,35 @@
 
 declare(strict_types=1);
 
-namespace {$namespace}\Requests\{$name};
+namespace App\Modules\{{ groupName }}\Requests\{{ name }};
 
 use Illuminate\Foundation\Http\FormRequest;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema(
-    schema: '{$schema}',
+    schema: '{{ schema }}',
     required: [
-{$dataSets[required]}
+{{ dataSets[required] }}
     ],
     properties: [
-{$dataSets[properties]}
+{{ dataSets[properties] }}
     ]
 )]
-class {$schema} extends FormRequest
+class {{ schema }} extends FormRequest
 {
-{$dataSets[consts]}
+{{ dataSets[consts] }}
 
     public function rules(): array
     {
         return [
-{$dataSets[rules]}
+{{ dataSets[rules] }}
         ];
     }
 
     public function messages(): array
     {
         return [
-{$dataSets[messages]}
+{{ dataSets[messages] }}
         ];
     }
 }

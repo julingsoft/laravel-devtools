@@ -6,6 +6,7 @@ namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\SchemaTrait;
 
 class GenController extends Command
@@ -31,13 +32,6 @@ class GenController extends Command
      */
     public function handle(): void
     {
-        $distDir = config('devtools.dist');
-        if (is_dir($distDir)) {
-            $this->deleteDirectories($distDir.'/Controllers');
-            $this->deleteDirectories($distDir.'/Requests');
-            $this->deleteDirectories($distDir.'/Responses');
-        }
-
         $tables = $this->getTables();
         foreach ($tables as $table) {
             $className = Str::studly($this->getSingular($table['name']));
@@ -54,39 +48,30 @@ class GenController extends Command
         }
     }
 
-    private function controllerTpl(string $name, string $comment): void
+    private function controllerTpl(string $className, string $comment): void
     {
-        $distDir = config('devtools.dist').'/Controllers';
-        if (! is_dir($distDir)) {
-            $this->ensureDirectoryExists($distDir);
-        }
+        $groupName = $this->getTableGroupName(Str::snake($className));
+        $dist = app_path('Modules/'.$groupName.'/Controllers');
+        $this->ensureDirectoryExists($dist);
 
-        $bundleName = $this->getTableGroupName(Str::snake($name));
-        $content = file_get_contents(__DIR__.'/stubs/controller/controller.stub');
-        $content = str_replace([
-            '{$name}',
-            '{$bundleName}',
-            '{$camelName}',
-            '{$comment}',
-            '{$namespace}',
-            '{$viewNamespace}',
-        ], [
-            $name,
-            $bundleName,
-            Str::camel($name),
-            $comment,
-            config('devtools.namespace'),
-            Str::camel(basename(config('devtools.dist'))),
-        ], $content);
-        file_put_contents(config('devtools.dist').'/Controllers/'.$name.'Controller.php', $content);
+        GenerateStub::from(__DIR__.'/stubs/controller/controller.stub')
+            ->to($dist)
+            ->name($className.'Controller')
+            ->ext('php')
+            ->replaces([
+                'groupName' => $groupName,
+                'name' => $className,
+                'camelName' => Str::camel($className),
+                'comment' => $comment,
+            ])
+            ->generate();
     }
 
-    private function requestTpl(string $name, array $columns): void
+    private function requestTpl(string $className, array $columns): void
     {
-        $distDir = config('devtools.dist').'/Requests/'.$name;
-        if (! is_dir($distDir)) {
-            $this->ensureDirectoryExists($distDir);
-        }
+        $groupName = $this->getTableGroupName(Str::snake($className));
+        $dist = app_path('Modules/'.$groupName.'/Requests/'.$className);
+        $this->ensureDirectoryExists($dist);
 
         $ignoreFields = ['created_at', 'updated_at', 'deleted_at'];
 
@@ -128,61 +113,55 @@ class GenController extends Command
             return rtrim($item, "\n");
         }, $dataSets);
 
-        $this->writeRequest($name, 'QueryRequest', '', '', '', '', '');
-        $this->writeRequest($name, 'UpsertRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages']);
+        $this->writeRequest($className, 'QueryRequest', '', '', '', '', '');
+        $this->writeRequest($className, 'UpsertRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages']);
     }
 
-    private function writeRequest($name, $suffix, $required, $properties, $consts, $rules, $messages): void
+    private function writeRequest($className, $suffix, $required, $properties, $consts, $rules, $messages): void
     {
-        $content = file_get_contents(__DIR__.'/stubs/request/request.stub');
-        $content = str_replace([
-            '{$name}',
-            '{$schema}',
-            '{$dataSets[required]}',
-            '{$dataSets[properties]}',
-            '{$dataSets[consts]}',
-            '{$dataSets[rules]}',
-            '{$dataSets[messages]}',
-            '{$namespace}',
-        ], [
-            $name,
-            $name.$suffix,
-            $required,
-            $properties,
-            $consts,
-            $rules,
-            $messages,
-            config('devtools.namespace'),
-        ], $content);
-        file_put_contents(config('devtools.dist').'/Requests/'.$name.'/'.$name.$suffix.'.php', $content);
+        $groupName = $this->getTableGroupName(Str::snake($className));
+        $dist = app_path('Modules/'.$groupName.'/Requests/'.$className);
+        $this->ensureDirectoryExists($dist);
+
+        GenerateStub::from(__DIR__.'/stubs/request/request.stub')
+            ->to($dist)
+            ->name($className.$suffix)
+            ->ext('php')
+            ->replaces([
+                'name' => $className,
+                'schema' => $className.$suffix,
+                'dataSets[required]' => $required,
+                'dataSets[properties]' => $properties,
+                'dataSets[consts]' => $consts,
+                'dataSets[rules]' => $rules,
+                'dataSets[messages]' => $messages,
+            ])
+            ->generate();
     }
 
-    private function responseTpl(string $name, array $columns): void
+    private function responseTpl(string $className, array $columns): void
     {
-        $distDir = config('devtools.dist').'/Responses/'.$name;
-        if (! is_dir($distDir)) {
-            $this->ensureDirectoryExists($distDir);
-        }
+        $groupName = $this->getTableGroupName(Str::snake($className));
+        $dist = app_path('Modules/'.$groupName.'/Responses/'.$className);
+        $this->ensureDirectoryExists($dist);
 
-        $content = file_get_contents(__DIR__.'/stubs/response/query.stub');
-        $content = str_replace([
-            '{$name}',
-            '{$namespace}',
-        ], [
-            $name,
-            config('devtools.namespace'),
-        ], $content);
-        file_put_contents(config('devtools.dist').'/Responses/'.$name.'/'.$name.'QueryResponse.php', $content);
+        GenerateStub::from(__DIR__.'/stubs/response/query.stub')
+            ->to($dist)
+            ->name($className.'QueryResponse')
+            ->ext('php')
+            ->replaces([
+                'name' => $className,
+            ])
+            ->generate();
 
-        $content = file_get_contents(__DIR__.'/stubs/response/destroy.stub');
-        $content = str_replace([
-            '{$name}',
-            '{$namespace}',
-        ], [
-            $name,
-            config('devtools.namespace'),
-        ], $content);
-        file_put_contents(config('devtools.dist').'/Responses/'.$name.'/'.$name.'DestroyResponse.php', $content);
+        GenerateStub::from(__DIR__.'/stubs/response/destroy.stub')
+            ->to($dist)
+            ->name($className.'DestroyResponse')
+            ->ext('php')
+            ->replaces([
+                'name' => $className,
+            ])
+            ->generate();
 
         $ignoreFields = ['deleted_time', 'password', 'password_salt'];
 
@@ -214,16 +193,14 @@ class GenController extends Command
 
         $fields = rtrim($fields, "\n");
 
-        $content = file_get_contents(__DIR__.'/stubs/response/response.stub');
-        $content = str_replace([
-            '{$name}',
-            '{$fields}',
-            '{$namespace}',
-        ], [
-            $name,
-            $fields,
-            config('devtools.namespace'),
-        ], $content);
-        file_put_contents(config('devtools.dist').'/Responses/'.$name.'/'.$name.'Response.php', $content);
+        GenerateStub::from(__DIR__.'/stubs/response/response.stub')
+            ->to($dist)
+            ->name($className.'Response')
+            ->ext('php')
+            ->replaces([
+                'name' => $className,
+                'fields' => $fields,
+            ])
+            ->generate();
     }
 }

@@ -40,8 +40,11 @@ class GenEntity extends Command
 
     private function entityTpl(string $tableName): void
     {
+        $groupName = $this->getTableGroupName($tableName);
         $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
+        $dist = app_path('Entities/'.$groupName);
+        $this->ensureDirectoryExists($dist);
 
         $fields = "\n";
         foreach ($columns as $column) {
@@ -79,10 +82,11 @@ class GenEntity extends Command
         $fields = rtrim($fields, "\n");
 
         GenerateStub::from(__DIR__.'/stubs/entity/entity.stub')
-            ->to(app_path('Entities'))
+            ->to($dist)
             ->name($className.'Entity')
             ->ext('php')
             ->replaces([
+                'groupName' => $groupName,
                 'name' => $className,
                 'fields' => $fields,
             ])

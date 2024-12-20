@@ -7,12 +7,15 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Juling\DevTools\Support\SchemaTrait;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 
 class GenModuleRoute extends Command
 {
+    use SchemaTrait;
+
     /**
      * The name and signature of the console command.
      *
@@ -41,6 +44,7 @@ class GenModuleRoute extends Command
             $module = basename($modulePath);
             $controllers = glob($modulePath.'/Controllers/*Controller.php');
             $routes = $this->getRouteContent(Str::camel($module), $this->getRoutes($controllers));
+            $this->ensureDirectoryExists($modulePath.'/Routes');
             file_put_contents($modulePath.'/Routes/web.php', $this->getTemplate($routes));
         }
     }

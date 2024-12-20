@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace {$namespace}\Responses\{$name};
+namespace App\Modules\{{ groupName }}\Responses\{{ name }};
 
 use Juling\Foundation\Support\DTOHelper;
 use OpenApi\Attributes as OA;
 
-#[OA\Schema(schema: '{$name}DestroyResponse')]
-class {$name}DestroyResponse
+#[OA\Schema(schema: '{{ name }}DestroyResponse')]
+class {{ name }}DestroyResponse
 {
     use DTOHelper;
 

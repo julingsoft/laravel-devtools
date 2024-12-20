@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Entities;
+namespace App\Entities\{{ groupName }};
 
 use Juling\Foundation\Support\DTOHelper;
 use OpenApi\Attributes as OA;

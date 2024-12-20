@@ -6,6 +6,7 @@ namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\SchemaTrait;
 
 class GenView extends Command
@@ -31,11 +32,6 @@ class GenView extends Command
      */
     public function handle(): void
     {
-        $distDir = config('devtools.dist');
-        if (is_dir($distDir)) {
-            $this->deleteDirectories($distDir.'/Views');
-        }
-
         $tables = $this->getTables();
         foreach ($tables as $table) {
             $className = Str::studly($this->getSingular($table['name']));
@@ -52,25 +48,21 @@ class GenView extends Command
         }
     }
 
-    private function tpl(string $name, string $comment, string $view): void
+    private function tpl(string $className, string $comment, string $view): void
     {
-        $distDir = config('devtools.dist').'/Views/'.Str::camel($name);
-        if (! is_dir($distDir)) {
-            $this->ensureDirectoryExists($distDir);
-        }
+        $groupName = $this->getTableGroupName(Str::snake($className));
+        $dist = app_path('Modules/'.$groupName.'/Views/'.Str::camel($className));
+        $this->ensureDirectoryExists($dist);
 
-        $content = file_get_contents(__DIR__.'/stubs/view/'.$view.'.stub');
-        $content = str_replace([
-            '{$name}',
-            '{$camelName}',
-            '{$comment}',
-            '{$namespace}',
-        ], [
-            $name,
-            Str::camel($name),
-            $comment,
-            config('devtools.namespace'),
-        ], $content);
-        file_put_contents(config('devtools.dist').'/Views/'.$name.'/'.$view.'.blade.php', $content);
+        GenerateStub::from(__DIR__.'/stubs/view/'.$view.'.stub')
+            ->to($dist)
+            ->name($view.'.blade')
+            ->ext('php')
+            ->replaces([
+                'groupName' => $groupName,
+                'name' => $className,
+                'comment' => $comment,
+            ])
+            ->generate();
     }
 }

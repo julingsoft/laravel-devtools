@@ -6,6 +6,7 @@ namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\SchemaTrait;
 
 class GenRepository extends Command
@@ -39,17 +40,20 @@ class GenRepository extends Command
 
     private function repositoryTpl(string $tableName): void
     {
+        $groupName = $this->getTableGroupName($tableName);
         $className = Str::studly($this->getSingular($tableName));
+        $dist = app_path('Repositories/'.$groupName);
+        $this->ensureDirectoryExists($dist);
 
-        $content = file_get_contents(__DIR__.'/stubs/repository/repository.stub');
-        $content = str_replace([
-            '{$name}',
-            '{$tableName}',
-        ], [
-            $className,
-            $tableName,
-        ], $content);
-
-        file_put_contents(app_path('Repositories/'.$className.'Repository.php'), $content);
+        GenerateStub::from(__DIR__.'/stubs/repository/repository.stub')
+            ->to($dist)
+            ->name($className.'Repository')
+            ->ext('php')
+            ->replaces([
+                'groupName' => $groupName,
+                'name' => $className,
+                'tableName' => $tableName,
+            ])
+            ->generate();
     }
 }

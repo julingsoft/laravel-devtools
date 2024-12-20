@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Bundles\{$group}\Services;
+namespace App\Bundles\{{ groupName }}\Services;
 
-use App\Services\{$name}Service;
+use App\Services\{{ groupName }}\{{ name }}Service;
 
-class {$name}BundleService extends {$name}Service
+class {{ name }}BundleService extends {{ name }}Service
 {
-    // 
+    //
 }

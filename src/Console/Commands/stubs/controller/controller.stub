@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace {$namespace}\Controllers;
+namespace App\Modules\{{ groupName }}\Controllers;
 
-use App\Bundles\{$bundleName}\Services\{$name}BundleService;
-use App\Entities\{$name}Entity;
-use {$namespace}\Requests\{$name}\{$name}QueryRequest;
-use {$namespace}\Requests\{$name}\{$name}UpsertRequest;
-use {$namespace}\Responses\{$name}\{$name}DestroyResponse;
-use {$namespace}\Responses\{$name}\{$name}QueryResponse;
-use {$namespace}\Responses\{$name}\{$name}Response;
+use App\Bundles\{{ groupName }}\Services\{{ name }}BundleService;
+use App\Entities\{{ groupName }}\{{ name }}Entity;
+use App\Http\Controllers\Controller;
+use App\Modules\{{ groupName }}\Requests\{{ name }}\{{ name }}QueryRequest;
+use App\Modules\{{ groupName }}\Requests\{{ name }}\{{ name }}UpsertRequest;
+use App\Modules\{{ groupName }}\Responses\{{ name }}\{{ name }}DestroyResponse;
+use App\Modules\{{ groupName }}\Responses\{{ name }}\{{ name }}QueryResponse;
+use App\Modules\{{ groupName }}\Responses\{{ name }}\{{ name }}Response;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,35 +22,35 @@ use Juling\Foundation\Exceptions\BusinessException;
 use OpenApi\Attributes as OA;
 use Throwable;
 
-class {$name}Controller extends BaseController
+class {{ name }}Controller extends Controller
 {
-    #[OA\Get(path: '/{$camelName}', summary: '显示列表页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Get(path: '/{{ camelName }}', summary: '显示列表页面', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
     #[OA\Response(response: 200, description: 'OK')]
     public function index(Request $request): Renderable
     {
-        return $this->display('{$camelName}.index');
+        return $this->display('{{ camelName }}.index');
     }
 
-    #[OA\Get(path: '/{$camelName}/create', summary: '显示新增页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Get(path: '/{{ camelName }}/create', summary: '显示新增页面', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
     #[OA\Response(response: 200, description: 'OK')]
     public function create(Request $request): Renderable
     {
-        return $this->display('{$camelName}.create');
+        return $this->display('{{ camelName }}.create');
     }
 
-    #[OA\Get(path: '/{$camelName}/edit', summary: '显示编辑页面', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Get(path: '/{{ camelName }}/edit', summary: '显示编辑页面', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
     #[OA\Response(response: 200, description: 'OK')]
     public function edit(Request $request): Renderable
     {
-        return $this->display('{$camelName}.edit');
+        return $this->display('{{ camelName }}.edit');
     }
 
-    #[OA\Post(path: '/{$camelName}/query', summary: '查询列表接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Post(path: '/{{ camelName }}/query', summary: '查询列表接口', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
     #[OA\Parameter(name: 'page', description: '当前页码', in: 'query', required: true, example: 1)]
     #[OA\Parameter(name: 'pageSize', description: '每页分页数', in: 'query', required: false, example: 10)]
-    #[OA\RequestBody(required: true, content: new OA\JsonContent(ref: {$name}QueryRequest::class))]
-    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {$name}QueryResponse::class))]
-    public function query({$name}QueryRequest $queryRequest): JsonResponse
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(ref: {{ name }}QueryRequest::class))]
+    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {{ name }}QueryResponse::class))]
+    public function query({{ name }}QueryRequest $queryRequest): JsonResponse
     {
         $page = intval($queryRequest->query('page', 1));
         $pageSize = intval($queryRequest->query('pageSize', 10));
@@ -58,11 +59,11 @@ class {$name}Controller extends BaseController
         try {
             $condition = [];
 
-            ${$camelName}BundleService = new {$name}BundleService;
-            $result = ${$camelName}BundleService->page($condition, $page, $pageSize);
+            ${{ camelName }}BundleService = new {{ name }}BundleService;
+            $result = ${{ camelName }}BundleService->page($condition, $page, $pageSize);
 
             foreach ($result['data'] as $key => $item) {
-                $response = new {$name}Response($item);
+                $response = new {{ name }}Response($item);
                 $result['data'][$key] = $response->toArray();
             }
 
@@ -78,19 +79,19 @@ class {$name}Controller extends BaseController
         }
     }
 
-    #[OA\Post(path: '/{$camelName}/store', summary: '新增接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
-    #[OA\RequestBody(required: true, content: new OA\JsonContent(ref: {$name}UpsertRequest::class))]
-    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {$name}Response::class))]
-    public function store({$name}UpsertRequest $createRequest): JsonResponse
+    #[OA\Post(path: '/{{ camelName }}/store', summary: '新增接口', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(ref: {{ name }}UpsertRequest::class))]
+    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {{ name }}Response::class))]
+    public function store({{ name }}UpsertRequest $createRequest): JsonResponse
     {
         $request = $createRequest->validated();
 
         DB::beginTransaction();
         try {
-            $input = new {$name}Entity($request);
+            $input = new {{ name }}Entity($request);
 
-            ${$camelName}BundleService = new {$name}BundleService;
-            if (${$camelName}BundleService->save($input->toArray())) {
+            ${{ camelName }}BundleService = new {{ name }}BundleService;
+            if (${{ camelName }}BundleService->save($input->toArray())) {
                 DB::commit();
 
                 return $this->success();
@@ -110,21 +111,21 @@ class {$name}Controller extends BaseController
         }
     }
 
-    #[OA\Get(path: '/{$camelName}/show', summary: '获取详情接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Get(path: '/{{ camelName }}/show', summary: '获取详情接口', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
     #[OA\Parameter(name: 'id', description: 'ID', in: 'query', required: true, example: 1)]
-    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {$name}Response::class))]
+    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {{ name }}Response::class))]
     public function show(Request $request): JsonResponse
     {
         $id = intval($request->query('id', 0));
 
         try {
-            ${$camelName}BundleService = new {$name}BundleService;
-            ${$camelName} = ${$camelName}BundleService->getOneById($id);
-            if (empty(${$camelName})) {
+            ${{ camelName }}BundleService = new {{ name }}BundleService;
+            ${{ camelName }} = ${{ camelName }}BundleService->getOneById($id);
+            if (empty(${{ camelName }})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
-            $response = new {$name}Response(${$camelName});
+            $response = new {{ name }}Response(${{ camelName }});
 
             return $this->success($response->toArray());
         } catch (Throwable $e) {
@@ -138,25 +139,25 @@ class {$name}Controller extends BaseController
         }
     }
 
-    #[OA\Put(path: '/{$camelName}/update', summary: '更新接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
-    #[OA\RequestBody(required: true, content: new OA\JsonContent(ref: {$name}UpsertRequest::class))]
-    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {$name}Response::class))]
-    public function update({$name}UpsertRequest $updateRequest): JsonResponse
+    #[OA\Put(path: '/{{ camelName }}/update', summary: '更新接口', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(ref: {{ name }}UpsertRequest::class))]
+    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {{ name }}Response::class))]
+    public function update({{ name }}UpsertRequest $updateRequest): JsonResponse
     {
         $request = $updateRequest->validated();
         $id = intval($request->query('id', 0));
 
         DB::beginTransaction();
         try {
-            ${$camelName}BundleService = new {$name}BundleService;
-            ${$camelName} = ${$camelName}BundleService->getOneById($id);
-            if (empty(${$camelName})) {
+            ${{ camelName }}BundleService = new {{ name }}BundleService;
+            ${{ camelName }} = ${{ camelName }}BundleService->getOneById($id);
+            if (empty(${{ camelName }})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
-            $input = new {$name}Entity($request);
+            $input = new {{ name }}Entity($request);
 
-            ${$camelName}BundleService->updateById($input->toArray(), $id);
+            ${{ camelName }}BundleService->updateById($input->toArray(), $id);
 
             DB::commit();
 
@@ -174,22 +175,22 @@ class {$name}Controller extends BaseController
         }
     }
 
-    #[OA\Delete(path: '/{$camelName}/destroy', summary: '删除接口', security: [['bearerAuth' => []]], tags: ['{$comment}'])]
+    #[OA\Delete(path: '/{{ camelName }}/destroy', summary: '删除接口', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
     #[OA\Parameter(name: 'id', description: 'ID', in: 'query', required: true, example: 1)]
-    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {$name}DestroyResponse::class))]
+    #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {{ name }}DestroyResponse::class))]
     public function destroy(Request $request): JsonResponse
     {
         $id = intval($request->query('id', 0));
 
         DB::beginTransaction();
         try {
-            ${$camelName}BundleService = new {$name}BundleService;
-            ${$camelName} = ${$camelName}BundleService->getOneById($id);
-            if (empty(${$camelName})) {
+            ${{ camelName }}BundleService = new {{ name }}BundleService;
+            ${{ camelName }} = ${{ camelName }}BundleService->getOneById($id);
+            if (empty(${{ camelName }})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
-            if (${$camelName}BundleService->removeById($id)) {
+            if (${{ camelName }}BundleService->removeById($id)) {
                 DB::commit();
 
                 return $this->success();

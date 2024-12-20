@@ -6,6 +6,7 @@ namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\SchemaTrait;
 
 class GenEnums extends Command
@@ -47,9 +48,7 @@ class GenEnums extends Command
     public function enumsTpl(string $groupName, string $tableName, string $comment): void
     {
         $dist = app_path('Bundles/'.$groupName.'/Enums');
-        if (! is_dir($dist)) {
-            $this->ensureDirectoryExists($dist);
-        }
+        $this->ensureDirectoryExists($dist);
 
         $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
@@ -90,24 +89,18 @@ EOF;
                 }
 
                 $className = $className.$enumsClass;
-                $enumFile = app_path('Bundles/'.$groupName.'/Enums/'.$className.'Enum.php');
-                if (! file_exists($enumFile)) {
-                    $content = file_get_contents(__DIR__.'/stubs/enums/enums.stub');
-                    $content = str_replace([
-                        '{$group}',
-                        '{$name}',
-                        '{$comment}',
-                        '{$enums}',
-                        '{$enumsType}',
-                    ], [
-                        $groupName,
-                        $className,
-                        $enumsName,
-                        $enums,
-                        $enumsType,
-                    ], $content);
-                    file_put_contents($enumFile, $content);
-                }
+                GenerateStub::from(__DIR__.'/stubs/enums/enums.stub')
+                    ->to($dist)
+                    ->name($className.'Enum')
+                    ->ext('php')
+                    ->replaces([
+                        'groupName' => $groupName,
+                        'name' => $className,
+                        'comment' => $enumsName,
+                        'enums' => $enums,
+                        'enumsType' => $enumsType,
+                    ])
+                    ->generate();
             }
         }
     }

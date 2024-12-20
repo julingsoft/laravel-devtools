@@ -6,6 +6,7 @@ namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\SchemaTrait;
 
 class GenService extends Command
@@ -34,49 +35,45 @@ class GenService extends Command
         $tables = $this->getTables();
         foreach ($tables as $table) {
             $className = Str::studly($this->getSingular($table['name']));
-            $this->serviceTpl($className);
+            $this->serviceTpl($table['name'], $className);
             $this->bundleTpl($table['name'], $className);
         }
     }
 
-    private function serviceTpl(string $className): void
+    private function serviceTpl(string $tableName, string $className): void
     {
-        $dist = app_path('Services');
-        if (! is_dir($dist)) {
-            $this->ensureDirectoryExists($dist);
-        }
+        $groupName = $this->getTableGroupName($tableName);
+        $dist = app_path('Services/'.$groupName);
+        $this->ensureDirectoryExists($dist);
 
-        $serviceFile = $dist.'/'.$className.'Service.php';
-        if (! file_exists($serviceFile)) {
-            $content = file_get_contents(__DIR__.'/stubs/service/service.stub');
-            $content = str_replace([
-                '{$name}',
-            ], [
-                $className,
-            ], $content);
-            file_put_contents($serviceFile, $content);
-        }
+        GenerateStub::from(__DIR__.'/stubs/service/service.stub')
+            ->to($dist)
+            ->name($className.'Service')
+            ->ext('php')
+            ->replaces([
+                'groupName' => $groupName,
+                'name' => $className,
+            ])
+            ->generate();
     }
 
     private function bundleTpl(string $tableName, string $className): void
     {
         $groupName = $this->getTableGroupName($tableName);
         $dist = app_path('Bundles/'.$groupName.'/Services');
-        if (! is_dir($dist)) {
-            $this->ensureDirectoryExists($dist);
-        }
+        $this->ensureDirectoryExists($dist);
 
         $bundleFile = $dist.'/'.$className.'BundleService.php';
         if (! file_exists($bundleFile)) {
-            $content = file_get_contents(__DIR__.'/stubs/service/bundle.stub');
-            $content = str_replace([
-                '{$group}',
-                '{$name}',
-            ], [
-                $groupName,
-                $className,
-            ], $content);
-            file_put_contents($bundleFile, $content);
+            GenerateStub::from(__DIR__.'/stubs/service/bundle.stub')
+                ->to($dist)
+                ->name($className.'BundleService')
+                ->ext('php')
+                ->replaces([
+                    'groupName' => $groupName,
+                    'name' => $className,
+                ])
+                ->generate();
         }
     }
 }

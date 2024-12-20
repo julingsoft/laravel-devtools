@@ -6,6 +6,7 @@ namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\SchemaTrait;
 
 class GenModel extends Command
@@ -45,10 +46,13 @@ class GenModel extends Command
 
     private function modelTpl(string $tableName): void
     {
+        $groupName = $this->getTableGroupName($tableName);
         $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
         $primaryKey = $this->getTablePrimaryKey($tableName);
         $ignoreColumns = array_merge($this->ignoreColumns, [$primaryKey]);
+        $dist = app_path('Models/'.$groupName);
+        $this->ensureDirectoryExists($dist);
 
         $softDelete = false;
 
@@ -68,21 +72,18 @@ class GenModel extends Command
             $useSoftDelete = "    use SoftDeletes;\n";
         }
 
-        $content = file_get_contents(__DIR__.'/stubs/model/model.stub');
-        $content = str_replace([
-            '{$name}',
-            '$tableName',
-            '$pk',
-            '$useSoftDelete',
-            '$fieldStr',
-        ], [
-            $className,
-            $tableName,
-            $primaryKey,
-            $useSoftDelete,
-            $fieldStr,
-        ], $content);
-
-        file_put_contents(app_path('Models/'.$className.'.php'), $content);
+        GenerateStub::from(__DIR__.'/stubs/model/model.stub')
+            ->to($dist)
+            ->name($className)
+            ->ext('php')
+            ->replaces([
+                'groupName' => $groupName,
+                'name' => $className,
+                'tableName' => $tableName,
+                'pk' => $primaryKey,
+                'useSoftDelete' => $useSoftDelete,
+                'fieldStr' => $fieldStr,
+            ])
+            ->generate();
     }
 }

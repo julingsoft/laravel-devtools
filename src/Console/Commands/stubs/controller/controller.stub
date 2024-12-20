@@ -28,21 +28,21 @@ class {{ name }}Controller extends Controller
     #[OA\Response(response: 200, description: 'OK')]
     public function index(Request $request): Renderable
     {
-        return $this->display('{{ camelName }}.index');
+        return $this->display('{{ groupName }}::{{ camelName }}.index');
     }
 
     #[OA\Get(path: '/{{ camelName }}/create', summary: '显示新增页面', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
     #[OA\Response(response: 200, description: 'OK')]
     public function create(Request $request): Renderable
     {
-        return $this->display('{{ camelName }}.create');
+        return $this->display('{{ groupName }}::{{ camelName }}.create');
     }
 
     #[OA\Get(path: '/{{ camelName }}/edit', summary: '显示编辑页面', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
     #[OA\Response(response: 200, description: 'OK')]
     public function edit(Request $request): Renderable
     {
-        return $this->display('{{ camelName }}.edit');
+        return $this->display('{{ groupName }}::{{ camelName }}.edit');
     }
 
     #[OA\Post(path: '/{{ camelName }}/query', summary: '查询列表接口', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]

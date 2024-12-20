@@ -104,8 +104,9 @@ class GenModuleRoute extends Command
 
     private function getRouteContent(string $module, array $routes): string
     {
+        $routeConfig = config('devtools.router');
         $routeContent = '// '.$module.' route start';
-        $routeContent .= "\nRoute::prefix('admin/{$module}')->middleware(['web', Privilege::class])->name('admin.')->group(function () {";
+        $routeContent .= "\nRoute::prefix('{$routeConfig['prefix']}/{$module}')->middleware(['web'])->name('{$routeConfig['name']}.')->group(function () {";
         foreach ($routes as $route) {
             $routeContent .= "\n    // ".$route['summary'];
             $routeContent .= "\n    Route::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";
@@ -132,7 +133,6 @@ class GenModuleRoute extends Command
 
 declare(strict_types=1);
 
-use App\Http\Middleware\Privilege;
 use Illuminate\Support\Facades\Route;
 
 $content

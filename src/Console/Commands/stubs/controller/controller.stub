@@ -12,7 +12,6 @@ use App\Modules\{{ groupName }}\Requests\{{ name }}\{{ name }}UpsertRequest;
 use App\Modules\{{ groupName }}\Responses\{{ name }}\{{ name }}DestroyResponse;
 use App\Modules\{{ groupName }}\Responses\{{ name }}\{{ name }}QueryResponse;
 use App\Modules\{{ groupName }}\Responses\{{ name }}\{{ name }}Response;
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,27 +23,6 @@ use Throwable;
 
 class {{ name }}Controller extends Controller
 {
-    #[OA\Get(path: '/{{ camelName }}', summary: '显示列表页面', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
-    #[OA\Response(response: 200, description: 'OK')]
-    public function index(Request $request): Renderable
-    {
-        return $this->display('{{ groupName }}::{{ camelName }}.index');
-    }
-
-    #[OA\Get(path: '/{{ camelName }}/create', summary: '显示新增页面', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
-    #[OA\Response(response: 200, description: 'OK')]
-    public function create(Request $request): Renderable
-    {
-        return $this->display('{{ groupName }}::{{ camelName }}.create');
-    }
-
-    #[OA\Get(path: '/{{ camelName }}/edit', summary: '显示编辑页面', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
-    #[OA\Response(response: 200, description: 'OK')]
-    public function edit(Request $request): Renderable
-    {
-        return $this->display('{{ groupName }}::{{ camelName }}.edit');
-    }
-
     #[OA\Post(path: '/{{ camelName }}/query', summary: '查询列表接口', security: [['bearerAuth' => []]], tags: ['{{ comment }}'])]
     #[OA\Parameter(name: 'page', description: '当前页码', in: 'query', required: true, example: 1)]
     #[OA\Parameter(name: 'pageSize', description: '每页分页数', in: 'query', required: false, example: 10)]

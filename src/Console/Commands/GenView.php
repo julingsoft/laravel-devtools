@@ -51,12 +51,13 @@ class GenView extends Command
     private function tpl(string $className, string $comment, string $view): void
     {
         $groupName = $this->getTableGroupName(Str::snake($className));
-        $dist = resource_path('admin/src/views/'.$groupName.'/'.Str::camel($className));
+        $className = Str::ltrim($className, $groupName);
+        $dist = resource_path('admin/src/views/'.Str::camel($groupName).'/'.Str::camel($className));
         $this->ensureDirectoryExists($dist);
 
         GenerateStub::from(__DIR__.'/stubs/view/'.$view.'.stub')
             ->to($dist)
-            ->name($view.'View')
+            ->name(Str::studly($view).'View')
             ->ext('vue')
             ->replaces([
                 'groupName' => $groupName,

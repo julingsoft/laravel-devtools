@@ -18,7 +18,7 @@ class GenView extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:view';
+    protected $signature = 'gen:view {--prefix=} {--table=}';
 
     /**
      * The console command description.
@@ -32,16 +32,13 @@ class GenView extends Command
      */
     public function handle(): void
     {
-        $tables = $this->getTables();
+        $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
-            $className = Str::studly($this->getSingular($table['name']));
-            $comment = $table['comment'];
-            if (Str::endsWith($comment, '表')) {
-                $comment = Str::substr($comment, 0, -1);
-            }
-            $comment .= '模块';
-            $columns = $this->getTableColumns($table['name']);
+            $tableName = $table['name'];
+            $className = Str::studly($this->getSingular($tableName));
+            $comment = Str::rtrim($table['comment'], '表').'模块';
 
+            $columns = $this->getTableColumns($table['name']);
             $this->tpl($className, $comment, 'index');
             $this->tpl($className, $comment, 'create');
             $this->tpl($className, $comment, 'edit');
@@ -52,6 +49,7 @@ class GenView extends Command
     {
         $groupName = $this->getTableGroupName(Str::snake($className));
         $className = Str::ltrim($className, $groupName);
+
         $dist = resource_path('admin/src/views/'.Str::camel($groupName).'/'.Str::camel($className));
         $this->ensureDirectoryExists($dist);
 
@@ -61,7 +59,7 @@ class GenView extends Command
             ->ext('vue')
             ->replaces([
                 'groupName' => $groupName,
-                'name' => $className,
+                'className' => $className,
                 'comment' => $comment,
             ])
             ->generate();

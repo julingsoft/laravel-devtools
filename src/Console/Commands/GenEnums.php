@@ -18,7 +18,7 @@ class GenEnums extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:enums';
+    protected $signature = 'gen:enums {--prefix=} {--table=}';
 
     /**
      * The console command description.
@@ -32,25 +32,28 @@ class GenEnums extends Command
      */
     public function handle(): void
     {
-        $tables = $this->getTables();
-        foreach ($tables as $key => $table) {
-            $groupName = $this->getTableGroupName($table['name']);
-            $comment = $table['comment'];
-            if (Str::endsWith($comment, '表')) {
-                $comment = Str::substr($comment, 0, -1);
-            }
-            $comment .= '模块';
+        $tables = $this->getTables($this->option('prefix'), $this->option('table'));
+        foreach ($tables as $table) {
+            $tableName = $table['name'];
+            $className = Str::studly($this->getSingular($tableName));
 
-            $this->enumsTpl($groupName, $table['name'], $comment);
+            $this->enumsTpl($className, $tableName);
         }
     }
 
-    public function enumsTpl(string $groupName, string $tableName, string $comment): void
+    public function enumsTpl(string $className, string $tableName): void
     {
-        $dist = app_path('Bundles/'.$groupName.'/Enums');
+        $config = config('devtools');
+        if ($config['multi_module']) {
+            $groupName = $this->getTableGroupName($tableName);
+            $dist = app_path('Modules/'.$groupName.'/Enums');
+            $namespace = "App\\Modules\\$groupName";
+        } else {
+            $dist = app_path('Enums');
+            $namespace = 'App';
+        }
         $this->ensureDirectoryExists($dist);
 
-        $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
         foreach ($columns as $column) {
             if ($column['type'] === 'enum' || $column['type_name'] === 'tinyint') {
@@ -94,8 +97,8 @@ EOF;
                     ->name($className.'Enum')
                     ->ext('php')
                     ->replaces([
-                        'groupName' => $groupName,
-                        'name' => $className,
+                        'namespace' => $namespace,
+                        'className' => $className,
                         'comment' => $enumsName,
                         'enums' => $enums,
                         'enumsType' => $enumsType,

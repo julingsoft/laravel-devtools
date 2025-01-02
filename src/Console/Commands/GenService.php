@@ -18,7 +18,7 @@ class GenService extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:service';
+    protected $signature = 'gen:service {--prefix=} {--table=}';
 
     /**
      * The console command description.
@@ -32,18 +32,27 @@ class GenService extends Command
      */
     public function handle(): void
     {
-        $tables = $this->getTables();
+        $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
-            $className = Str::studly($this->getSingular($table['name']));
-            $this->serviceTpl($table['name'], $className);
-            $this->bundleTpl($table['name'], $className);
+            $tableName = $table['name'];
+            $className = Str::studly($this->getSingular($tableName));
+
+            $this->serviceTpl($className, $tableName);
+            $this->bundleTpl($className, $tableName);
         }
     }
 
-    private function serviceTpl(string $tableName, string $className): void
+    private function serviceTpl(string $className, string $tableName): void
     {
-        $groupName = $this->getTableGroupName($tableName);
-        $dist = app_path('Services/'.$groupName);
+        $config = config('devtools');
+        if ($config['multi_module']) {
+            $groupName = $this->getTableGroupName($tableName);
+            $dist = app_path('Modules/'.$groupName.'/Services');
+            $namespace = "App\\Modules\\$groupName";
+        } else {
+            $dist = app_path('Services');
+            $namespace = 'App';
+        }
         $this->ensureDirectoryExists($dist);
 
         GenerateStub::from(__DIR__.'/stubs/service/service.stub')
@@ -51,17 +60,26 @@ class GenService extends Command
             ->name($className.'Service')
             ->ext('php')
             ->replaces([
-                'groupName' => $groupName,
-                'name' => $className,
+                'namespace' => $namespace,
+                'className' => $className,
             ])
             ->generate();
     }
 
-    private function bundleTpl(string $tableName, string $className): void
+    private function bundleTpl(string $className, string $tableName): void
     {
         $groupName = $this->getTableGroupName($tableName);
+        $namespace = "App\\Bundles\\$groupName";
         $dist = app_path('Bundles/'.$groupName.'/Services');
         $this->ensureDirectoryExists($dist);
+
+        $config = config('devtools');
+        if ($config['multi_module']) {
+            $groupName = $this->getTableGroupName($tableName);
+            $useNamespace = "App\\Modules\\$groupName";
+        } else {
+            $useNamespace = 'App';
+        }
 
         $bundleFile = $dist.'/'.$className.'BundleService.php';
         if (! file_exists($bundleFile)) {
@@ -70,8 +88,10 @@ class GenService extends Command
                 ->name($className.'BundleService')
                 ->ext('php')
                 ->replaces([
+                    'namespace' => $namespace,
+                    'useNamespace' => $useNamespace,
                     'groupName' => $groupName,
-                    'name' => $className,
+                    'className' => $className,
                 ])
                 ->generate();
         }

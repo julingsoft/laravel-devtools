@@ -28,7 +28,7 @@ class GenModuleRoute extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Generate project module routes';
 
     protected array $ignoreList = ['Base'];
 
@@ -85,8 +85,8 @@ class GenModuleRoute extends Command
             $methodAttributes = $reflectionClass->getMethod($method->name)->getAttributes();
             if (isset($methodAttributes[0])) {
                 $methodAttribute = $methodAttributes[0];
-                if (!isset($methodAttribute->getArguments()['path'])) {
-                    die('Route path not found:'.$class.'@'.$method->name);
+                if (! isset($methodAttribute->getArguments()['path'])) {
+                    exit('Route path not found:'.$class.'@'.$method->name);
                 }
 
                 $routes[] = [

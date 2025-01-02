@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Bundles\{{ groupName }}\Enums;
+namespace {{ namespace }}\Enums;
 
 use Juling\Foundation\Contracts\EnumMethodInterface;
 use Juling\Foundation\Support\EnumMethods;
@@ -10,7 +10,7 @@ use Juling\Foundation\Support\EnumMethods;
 /**
  * {{ comment }}枚举
  */
-enum {{ name }}Enum: {{ enumsType }} implements EnumMethodInterface
+enum {{ className }}Enum: {{ enumsType }} implements EnumMethodInterface
 {
     use EnumMethods;{{ enums }}
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Juling\DevTools\Support;
 
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -25,15 +25,28 @@ trait SchemaTrait
 
     private bool $ignoreSingular = true;
 
-    private function getTables(): array
+    private function getTables(?string $tablePrefix = null, ?string $tableName = null): array
     {
         $this->ignoreTables = array_merge($this->ignoreTables, config('devtools.ignore_tables', []));
 
         $tables = Schema::getTables();
-
         foreach ($tables as $key => $table) {
             if (in_array($table['name'], $this->ignoreTables)) {
                 unset($tables[$key]);
+            }
+
+            // 匹配表前缀
+            if (! empty($tablePrefix)) {
+                if (! Str::startsWith($table['name'], $tablePrefix)) {
+                    unset($tables[$key]);
+                }
+            }
+
+            // 匹配表名称
+            if (! empty($tableName)) {
+                if ($table['name'] !== $tableName) {
+                    unset($tables[$key]);
+                }
             }
         }
 
@@ -43,8 +56,12 @@ trait SchemaTrait
     private function getTableColumns($tableName): array
     {
         $columns = Schema::getColumns($tableName);
+        $indexes = Schema::getIndexes($tableName);
+        $indexes = Arr::pluck($indexes, 'columns');
+        $indexes = Arr::collapse($indexes);
 
         foreach ($columns as $key => $row) {
+            $row['index'] = in_array($row['name'], $indexes);
             $row['camel_name'] = Str::camel($row['name']);
             $row['studly_name'] = Str::studly($row['name']);
             $row['base_type'] = $this->getFieldType($row['type_name']);
@@ -57,12 +74,12 @@ trait SchemaTrait
 
     private function getTablePrimaryKey($tableName): string
     {
-        $columns = DB::select("SHOW KEYS FROM $tableName WHERE Key_name = 'PRIMARY'");
+        $columns = Schema::getIndexes($tableName);
 
         $primaryKey = 'id';
         foreach ($columns as $column) {
-            if ($column->Key_name == 'PRIMARY') {
-                $primaryKey = $column->Column_name;
+            if ($column['primary']) {
+                $primaryKey = Arr::first($column['columns']);
                 break;
             }
         }

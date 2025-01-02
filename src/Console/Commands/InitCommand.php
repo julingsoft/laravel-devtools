@@ -26,17 +26,8 @@ class InitCommand extends Command
     public function handle(): void
     {
         $fs = new Filesystem;
-
-        $fs->ensureDirectoryExists(app_path('API'));
-        $fs->ensureDirectoryExists(app_path('Bundles'));
-        $fs->ensureDirectoryExists(app_path('Entities'));
-        $fs->ensureDirectoryExists(app_path('Enums'));
-        $fs->ensureDirectoryExists(app_path('Repositories'));
-        $fs->ensureDirectoryExists(app_path('Services'));
-        $fs->ensureDirectoryExists(app_path('Support'));
-
-        $fs->ensureDirectoryExists(storage_path('app/openapi'));
-        $fs->ensureDirectoryExists(storage_path('app/ts/services'));
-        $fs->ensureDirectoryExists(storage_path('app/ts/types'));
+        $fs->ensureDirectoryExists(public_path('openapi'));
+        $fs->ensureDirectoryExists(resource_path('ts/services'));
+        $fs->ensureDirectoryExists(resource_path('ts/types'));
     }
 }

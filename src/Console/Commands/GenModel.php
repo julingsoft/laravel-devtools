@@ -18,7 +18,7 @@ class GenModel extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:model';
+    protected $signature = 'gen:model {--prefix=} {--table=}';
 
     /**
      * The console command description.
@@ -38,25 +38,35 @@ class GenModel extends Command
      */
     public function handle(): void
     {
-        $tables = $this->getTables();
+        $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
-            $this->modelTpl($table['name']);
+            $tableName = $table['name'];
+            $className = Str::studly($this->getSingular($tableName));
+
+            $this->modelTpl($className, $tableName);
         }
     }
 
-    private function modelTpl(string $tableName): void
+    private function modelTpl(string $className, string $tableName): void
     {
-        $groupName = $this->getTableGroupName($tableName);
-        $className = Str::studly($this->getSingular($tableName));
-        $columns = $this->getTableColumns($tableName);
+        $config = config('devtools');
+        if ($config['multi_module']) {
+            $groupName = $this->getTableGroupName($tableName);
+            $dist = app_path('Modules/'.$groupName.'/Models');
+            $namespace = "App\\Modules\\$groupName";
+        } else {
+            $dist = app_path('Models');
+            $namespace = 'App';
+        }
+        $this->ensureDirectoryExists($dist);
+
         $primaryKey = $this->getTablePrimaryKey($tableName);
         $ignoreColumns = array_merge($this->ignoreColumns, [$primaryKey]);
-        $dist = app_path('Models/'.$groupName);
-        $this->ensureDirectoryExists($dist);
 
         $softDelete = false;
 
         $fieldStr = '';
+        $columns = $this->getTableColumns($tableName);
         foreach ($columns as $column) {
             if (! in_array($column['name'], $ignoreColumns)) {
                 $fieldStr .= str_pad(' ', 8)."'{$column['name']}',\n";
@@ -77,8 +87,8 @@ class GenModel extends Command
             ->name($className)
             ->ext('php')
             ->replaces([
-                'groupName' => $groupName,
-                'name' => $className,
+                'namespace' => $namespace,
+                'className' => $className,
                 'tableName' => $tableName,
                 'pk' => $primaryKey,
                 'useSoftDelete' => $useSoftDelete,

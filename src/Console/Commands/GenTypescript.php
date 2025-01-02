@@ -26,21 +26,21 @@ class GenTypescript extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
-        $files = glob(storage_path('app/openapi/*.json'));
+        $files = glob(public_path('openapi/*.json'));
         foreach ($files as $file) {
             $module = basename($file, '.json');
             $data = json_decode(file_get_contents($file), true);
 
-            $servicePath = storage_path('app/ts/services');
+            $servicePath = resource_path('ts/services');
             if (! is_dir($servicePath)) {
                 mkdir($servicePath, 0755, true);
             }
             $serviceContent = $this->genServices($data, $module);
             file_put_contents($servicePath.'/'.$module.'.ts', $serviceContent);
 
-            $typePath = storage_path('app/ts/types');
+            $typePath = resource_path('ts/types');
             if (! is_dir($typePath)) {
                 mkdir($typePath, 0755, true);
             }

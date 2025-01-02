@@ -18,7 +18,7 @@ class GenEntity extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:entity';
+    protected $signature = 'gen:entity {--prefix=} {--table=}';
 
     /**
      * The console command description.
@@ -32,21 +32,33 @@ class GenEntity extends Command
      */
     public function handle(): void
     {
-        $tables = $this->getTables();
+        $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
-            $this->entityTpl($table['name']);
+            $tableName = $table['name'];
+            $className = Str::studly($this->getSingular($tableName));
+            $comment = Str::rtrim($table['comment'], '表');
+
+            $this->entityTpl($tableName);
         }
     }
 
     private function entityTpl(string $tableName): void
     {
-        $groupName = $this->getTableGroupName($tableName);
-        $className = Str::studly($this->getSingular($tableName));
-        $columns = $this->getTableColumns($tableName);
-        $dist = app_path('Entities/'.$groupName);
+        $config = config('devtools');
+        if ($config['multi_module']) {
+            $groupName = $this->getTableGroupName($tableName);
+            $dist = app_path('Modules/'.$groupName.'/Entities');
+            $namespace = "App\\Modules\\$groupName";
+        } else {
+            $dist = app_path('Entities');
+            $namespace = 'App';
+        }
+
         $this->ensureDirectoryExists($dist);
 
         $fields = "\n";
+        $className = Str::studly($this->getSingular($tableName));
+        $columns = $this->getTableColumns($tableName);
         foreach ($columns as $column) {
             $fields .= "    const string get{$column['studly_name']} = '{$column['name']}';";
             if (! empty($column['comment'])) {
@@ -86,8 +98,8 @@ class GenEntity extends Command
             ->name($className.'Entity')
             ->ext('php')
             ->replaces([
-                'groupName' => $groupName,
-                'name' => $className,
+                'namespace' => $namespace,
+                'className' => $className,
                 'fields' => $fields,
             ])
             ->generate();

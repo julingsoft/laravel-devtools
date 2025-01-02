@@ -18,7 +18,7 @@ class GenController extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:controller';
+    protected $signature = 'gen:controller {--prefix=} {--table=}';
 
     /**
      * The console command description.
@@ -32,15 +32,12 @@ class GenController extends Command
      */
     public function handle(): void
     {
-        $tables = $this->getTables();
+        $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
-            $className = Str::studly($this->getSingular($table['name']));
-            $comment = $table['comment'];
-            if (Str::endsWith($comment, '表')) {
-                $comment = Str::substr($comment, 0, -1);
-            }
-            $comment .= '模块';
-            $columns = $this->getTableColumns($table['name']);
+            $tableName = $table['name'];
+            $className = Str::studly($this->getSingular($tableName));
+            $comment = Str::rtrim($table['comment'], '表');
+            $columns = $this->getTableColumns($tableName);
 
             $this->controllerTpl($className, $comment);
             $this->requestTpl($className, $columns);
@@ -51,17 +48,26 @@ class GenController extends Command
     private function controllerTpl(string $className, string $comment): void
     {
         $groupName = $this->getTableGroupName(Str::snake($className));
-        $dist = app_path('Modules/'.$groupName.'/Controllers');
-        $this->ensureDirectoryExists($dist);
 
+        $config = config('devtools');
+        if ($config['multi_module']) {
+            $dist = app_path('Modules/'.$groupName.'/Http/Controllers');
+            $namespace = "App\\Modules\\$groupName";
+        } else {
+            $dist = app_path('Http/Controllers');
+            $namespace = 'App';
+        }
+
+        $this->ensureDirectoryExists($dist);
         GenerateStub::from(__DIR__.'/stubs/controller/controller.stub')
             ->to($dist)
             ->name($className.'Controller')
             ->ext('php')
             ->replaces([
+                'namespace' => $namespace,
+                'className' => $className,
                 'groupName' => $groupName,
-                'name' => $className,
-                'camelName' => Str::camel($className),
+                'classCamelName' => Str::camel($className),
                 'comment' => $comment,
             ])
             ->generate();
@@ -69,13 +75,9 @@ class GenController extends Command
 
     private function requestTpl(string $className, array $columns): void
     {
-        $groupName = $this->getTableGroupName(Str::snake($className));
-        $dist = app_path('Modules/'.$groupName.'/Requests/'.$className);
-        $this->ensureDirectoryExists($dist);
-
         $ignoreFields = ['created_at', 'updated_at', 'deleted_at'];
-
         $dataSets = ['required' => '', 'properties' => '', 'consts' => '', 'rules' => '', 'messages' => ''];
+
         foreach ($columns as $column) {
             if (in_array($column['name'], $ignoreFields)) {
                 continue;
@@ -95,18 +97,18 @@ class GenController extends Command
             if ($column['name'] === 'deleted_at' && empty($column['comment'])) {
                 $column['comment'] = '删除时间';
             }
-            $camelName = Str::studly($column['name']);
-            $dataSets['required'] .= "        self::get{$camelName},\n";
-            $dataSets['properties'] .= "        new OA\Property(property: self::get{$camelName}, description: '{$column['comment']}', type: '{$column['swagger_type']}'),\n";
-            $dataSets['consts'] .= "    const string get{$camelName} = '{$column['name']}';\n\n";
-            $dataSets['rules'] .= "            self::get{$camelName} => 'require',\n";
+            $classCamelName = Str::studly($column['name']);
+            $dataSets['required'] .= "        self::get{$classCamelName},\n";
+            $dataSets['properties'] .= "        new OA\Property(property: self::get{$classCamelName}, description: '{$column['comment']}', type: '{$column['swagger_type']}'),\n";
+            $dataSets['consts'] .= "    const string get{$classCamelName} = '{$column['name']}';\n\n";
+            $dataSets['rules'] .= "            self::get{$classCamelName} => 'require',\n";
 
             $column['comment'] = Str::replace([':', '：'], ':', $column['comment']);
             $endPosition = Str::position($column['comment'], ':');
             if ($endPosition !== false) {
                 $column['comment'] = Str::substr($column['comment'], 0, $endPosition);
             }
-            $dataSets['messages'] .= "            self::get{$camelName}.'.require' => '请设置{$column['comment']}',\n";
+            $dataSets['messages'] .= "            self::get{$classCamelName}.'.require' => '请设置{$column['comment']}',\n";
         }
 
         $dataSets = array_map(function ($item) {
@@ -119,16 +121,24 @@ class GenController extends Command
 
     private function writeRequest($className, $suffix, $required, $properties, $consts, $rules, $messages): void
     {
-        $groupName = $this->getTableGroupName(Str::snake($className));
-        $dist = app_path('Modules/'.$groupName.'/Requests/'.$className);
-        $this->ensureDirectoryExists($dist);
+        $config = config('devtools');
+        if ($config['multi_module']) {
+            $groupName = $this->getTableGroupName(Str::snake($className));
+            $dist = app_path('Modules/'.$groupName.'/Http/Requests/'.$className);
+            $namespace = "App\\Modules\\$groupName\\Http";
+        } else {
+            $dist = app_path('Http/Requests/'.$className);
+            $namespace = 'App\\Http';
+        }
 
+        $this->ensureDirectoryExists($dist);
         GenerateStub::from(__DIR__.'/stubs/request/request.stub')
             ->to($dist)
             ->name($className.$suffix)
             ->ext('php')
             ->replaces([
-                'name' => $className,
+                'namespace' => $namespace,
+                'className' => $className,
                 'schema' => $className.$suffix,
                 'dataSets[required]' => $required,
                 'dataSets[properties]' => $properties,
@@ -141,8 +151,16 @@ class GenController extends Command
 
     private function responseTpl(string $className, array $columns): void
     {
-        $groupName = $this->getTableGroupName(Str::snake($className));
-        $dist = app_path('Modules/'.$groupName.'/Responses/'.$className);
+        $config = config('devtools');
+        if ($config['multi_module']) {
+            $groupName = $this->getTableGroupName(Str::snake($className));
+            $dist = app_path('Modules/'.$groupName.'/Http/Responses/'.$className);
+            $namespace = "App\\Modules\\$groupName\\Http";
+        } else {
+            $dist = app_path('Http/Responses/'.$className);
+            $namespace = 'App\\Http';
+        }
+
         $this->ensureDirectoryExists($dist);
 
         GenerateStub::from(__DIR__.'/stubs/response/query.stub')
@@ -150,7 +168,8 @@ class GenController extends Command
             ->name($className.'QueryResponse')
             ->ext('php')
             ->replaces([
-                'name' => $className,
+                'namespace' => $namespace,
+                'className' => $className,
             ])
             ->generate();
 
@@ -159,7 +178,8 @@ class GenController extends Command
             ->name($className.'DestroyResponse')
             ->ext('php')
             ->replaces([
-                'name' => $className,
+                'namespace' => $namespace,
+                'className' => $className,
             ])
             ->generate();
 
@@ -198,7 +218,8 @@ class GenController extends Command
             ->name($className.'Response')
             ->ext('php')
             ->replaces([
-                'name' => $className,
+                'namespace' => $namespace,
+                'className' => $className,
                 'fields' => $fields,
             ])
             ->generate();

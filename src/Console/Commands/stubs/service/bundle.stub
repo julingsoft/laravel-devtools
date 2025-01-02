@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Bundles\{{ groupName }}\Services;
 
-use App\Services\{{ groupName }}\{{ name }}Service;
+use {{ useNamespace }}\Services\{{ className }}Service;
 
-class {{ name }}BundleService extends {{ name }}Service
+class {{ className }}BundleService extends {{ className }}Service
 {
     //
 }

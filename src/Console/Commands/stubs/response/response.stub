@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\{{ groupName }}\Responses\{{ name }};
+namespace {{ namespace }}\Responses\{{ className }};
 
 use Juling\Foundation\Support\DTOHelper;
 use OpenApi\Attributes as OA;
 
-#[OA\Schema(schema: '{{ name }}Response')]
-class {{ name }}Response
+#[OA\Schema(schema: '{{ className }}Response')]
+class {{ className }}Response
 {
     use DTOHelper;
 {{ fields }}

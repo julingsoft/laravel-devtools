@@ -2,36 +2,36 @@
 
 declare(strict_types=1);
 
-namespace App\Repositories\{{ groupName }};
+namespace {{ namespace }}\Repositories;
 
-use App\Entities\{{ groupName }}\{{ name }}Entity;
-use App\Models\{{ groupName }}\{{ name }};
+use {{ namespace }}\Entities\{{ className }}Entity;
+use {{ namespace }}\Models\{{ className }};
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Juling\Foundation\Contracts\RepositoryInterface;
 use Juling\Foundation\Repositories\CurdRepository;
 
-class {{ name }}Repository extends CurdRepository implements RepositoryInterface
+class {{ className }}Repository extends CurdRepository implements RepositoryInterface
 {
-    private static ?{{ name }}Repository $instance = null;
+    private static ?{{ className }}Repository $instance = null;
 
     /**
-     * 单例 {{ name }}Repository
+     * 单例 {{ className }}Repository
      */
-    public static function getInstance(): {{ name }}Repository
+    public static function getInstance(): {{ className }}Repository
     {
         if (is_null(self::$instance)) {
-            self::$instance = new {{ name }}Repository;
+            self::$instance = new {{ className }}Repository;
         }
 
         return self::$instance;
     }
 
     /**
-     * 添加 {{ name }}Entity
+     * 添加 {{ className }}Entity
      */
-    public function saveEntity({{ name }}Entity $entity): int
+    public function saveEntity({{ className }}Entity $entity): int
     {
         return $this->save($entity->toEntity());
     }
@@ -39,27 +39,27 @@ class {{ name }}Repository extends CurdRepository implements RepositoryInterface
     /**
      * 按照ID查询返回对象
      */
-    public function findOneById(int $id): ?{{ name }}Entity
+    public function findOneById(int $id): ?{{ className }}Entity
     {
         $data = $this->findById($id);
         if (empty($data)) {
             return null;
         }
 
-        return new {{ name }}Entity($data);
+        return new {{ className }}Entity($data);
     }
 
     /**
      * 按照条件查询返回对象
      */
-    public function findOne(array $condition = []): ?{{ name }}Entity
+    public function findOne(array $condition = []): ?{{ className }}Entity
     {
         $data = $this->find($condition);
         if (empty($data)) {
             return null;
         }
 
-        return new {{ name }}Entity($data);
+        return new {{ className }}Entity($data);
     }
 
     /**
@@ -75,6 +75,6 @@ class {{ name }}Repository extends CurdRepository implements RepositoryInterface
      */
     public function model(): Model
     {
-        return new {{ name }};
+        return new {{ className }};
     }
 }

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Services\{{ groupName }};
+namespace {{ namespace }}\Services;
 
-use App\Repositories\{{ groupName }}\{{ name }}Repository;
+use {{ namespace }}\Repositories\{{ className }}Repository;
 use Juling\Foundation\Contracts\ServiceInterface;
 use Juling\Foundation\Services\CommonService;
 
-class {{ name }}Service extends CommonService implements ServiceInterface
+class {{ className }}Service extends CommonService implements ServiceInterface
 {
-    public function getRepository(): {{ name }}Repository
+    public function getRepository(): {{ className }}Repository
     {
-        return {{ name }}Repository::getInstance();
+        return {{ className }}Repository::getInstance();
     }
 }

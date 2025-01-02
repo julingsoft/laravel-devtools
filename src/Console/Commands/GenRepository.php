@@ -18,7 +18,7 @@ class GenRepository extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:dao';
+    protected $signature = 'gen:dao {--prefix=} {--table=}';
 
     /**
      * The console command description.
@@ -32,17 +32,26 @@ class GenRepository extends Command
      */
     public function handle(): void
     {
-        $tables = $this->getTables();
+        $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
-            $this->repositoryTpl($table['name']);
+            $tableName = $table['name'];
+            $className = Str::studly($this->getSingular($tableName));
+
+            $this->repositoryTpl($className, $tableName);
         }
     }
 
-    private function repositoryTpl(string $tableName): void
+    private function repositoryTpl(string $className, string $tableName): void
     {
-        $groupName = $this->getTableGroupName($tableName);
-        $className = Str::studly($this->getSingular($tableName));
-        $dist = app_path('Repositories/'.$groupName);
+        $config = config('devtools');
+        if ($config['multi_module']) {
+            $groupName = $this->getTableGroupName($tableName);
+            $dist = app_path('Modules/'.$groupName.'/Repositories');
+            $namespace = "App\\Modules\\$groupName";
+        } else {
+            $dist = app_path('Repositories');
+            $namespace = 'App';
+        }
         $this->ensureDirectoryExists($dist);
 
         GenerateStub::from(__DIR__.'/stubs/repository/repository.stub')
@@ -50,8 +59,8 @@ class GenRepository extends Command
             ->name($className.'Repository')
             ->ext('php')
             ->replaces([
-                'groupName' => $groupName,
-                'name' => $className,
+                'namespace' => $namespace,
+                'className' => $className,
                 'tableName' => $tableName,
             ])
             ->generate();

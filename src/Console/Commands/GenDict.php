@@ -28,19 +28,21 @@ class GenDict extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
+        $dist = base_path('docs');
+        $this->ensureDirectoryExists($dist);
+
         $content = "# 数据字典\n\n";
 
         $tables = $this->getTables();
         foreach ($tables as $table) {
             $content .= "### {$table['comment']}(`{$table['name']}`)\n";
-
             $columns = $this->getTableColumns($table['name']);
             $content .= $this->getContent($columns);
         }
 
-        file_put_contents(storage_path('app/dict.md'), $content);
+        file_put_contents($dist.'/dict.md', $content);
     }
 
     public function getContent($columns): string
@@ -49,7 +51,8 @@ class GenDict extends Command
         $content .= "| ------- | --------- | --------- | --------- | -------------- |\n";
         foreach ($columns as $column) {
             $isNull = $column['nullable'] ? '是' : '否';
-            $content .= "| {$column['name']} | {$column['type']} | {$column['Key']} | $isNull | {$column['comment']} |\n";
+            $isIndex = $column['index'] ? '是' : '否';
+            $content .= "| {$column['name']} | {$column['type']} | {$isIndex} | $isNull | {$column['comment']} |\n";
         }
         $content .= "\n";
 

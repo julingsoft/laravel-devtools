@@ -104,7 +104,7 @@ class GenRoute extends Command
     private function genRoutes(string $module, array $routes, string $routeFile): void
     {
         $routeContent = '// Route start';
-        $routeContent .= "\nRoute::prefix('api/{$module}')->middleware('api')->group(function () {";
+        $routeContent .= "\nRoute::prefix('{$module}')->group(function () {";
         foreach ($routes as $route) {
             $routeContent .= "\n    // ".$route['summary'];
             $routeContent .= "\n    Route::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";

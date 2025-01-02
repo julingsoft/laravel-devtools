@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace {{ namespace }}\Http\Controllers;
+namespace {{ namespace }}\Controllers;
 
 use App\Bundles\{{ groupName }}\Services\{{ className }}BundleService;
 use App\Http\Controllers\Controller;
-use {{ namespace }}\Entities\{{ className }}Entity;
-use {{ namespace }}\Http\Requests\{{ className }}\{{ className }}QueryRequest;
-use {{ namespace }}\Http\Requests\{{ className }}\{{ className }}UpsertRequest;
-use {{ namespace }}\Http\Responses\{{ className }}\{{ className }}DestroyResponse;
-use {{ namespace }}\Http\Responses\{{ className }}\{{ className }}QueryResponse;
-use {{ namespace }}\Http\Responses\{{ className }}\{{ className }}Response;
+use {{ baseNamespace }}\Entities\{{ className }}Entity;
+use {{ namespace }}\Requests\{{ className }}\{{ className }}QueryRequest;
+use {{ namespace }}\Requests\{{ className }}\{{ className }}UpsertRequest;
+use {{ namespace }}\Responses\{{ className }}\{{ className }}DestroyResponse;
+use {{ namespace }}\Responses\{{ className }}\{{ className }}QueryResponse;
+use {{ namespace }}\Responses\{{ className }}\{{ className }}Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

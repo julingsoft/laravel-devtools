@@ -18,7 +18,7 @@ class GenController extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:controller {--prefix=} {--table=}';
+    protected $signature = 'gen:controller {outDir=v1} {--prefix=} {--table=}';
 
     /**
      * The console command description.
@@ -32,6 +32,8 @@ class GenController extends Command
      */
     public function handle(): void
     {
+        $outDir = Str::studly($this->argument('outDir'));
+
         $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
             $tableName = $table['name'];
@@ -39,23 +41,25 @@ class GenController extends Command
             $comment = Str::rtrim($table['comment'], '表');
             $columns = $this->getTableColumns($tableName);
 
-            $this->controllerTpl($className, $comment);
-            $this->requestTpl($className, $columns);
-            $this->responseTpl($className, $columns);
+            $this->controllerTpl($className, $comment, $outDir);
+            $this->requestTpl($className, $columns, $outDir);
+            $this->responseTpl($className, $columns, $outDir);
         }
     }
 
-    private function controllerTpl(string $className, string $comment): void
+    private function controllerTpl(string $className, string $comment, string $outDir): void
     {
         $groupName = $this->getTableGroupName(Str::snake($className));
 
         $config = config('devtools');
         if ($config['multi_module']) {
             $dist = app_path('Modules/'.$groupName.'/Http/Controllers');
-            $namespace = "App\\Modules\\$groupName";
+            $baseNamespace = "App\\Modules\\$groupName";
+            $namespace = $baseNamespace.'\\Http';
         } else {
-            $dist = app_path('Http/Controllers');
-            $namespace = 'App';
+            $dist = app_path('API/'.$outDir.'/Controllers');
+            $baseNamespace = 'App';
+            $namespace = $baseNamespace.'\\API\\'.$outDir;
         }
 
         $this->ensureDirectoryExists($dist);
@@ -65,6 +69,7 @@ class GenController extends Command
             ->ext('php')
             ->replaces([
                 'namespace' => $namespace,
+                'baseNamespace' => $baseNamespace,
                 'className' => $className,
                 'groupName' => $groupName,
                 'classCamelName' => Str::camel($className),
@@ -73,7 +78,7 @@ class GenController extends Command
             ->generate();
     }
 
-    private function requestTpl(string $className, array $columns): void
+    private function requestTpl(string $className, array $columns, string $outDir): void
     {
         $ignoreFields = ['created_at', 'updated_at', 'deleted_at'];
         $dataSets = ['required' => '', 'properties' => '', 'consts' => '', 'rules' => '', 'messages' => ''];
@@ -115,11 +120,11 @@ class GenController extends Command
             return rtrim($item, "\n");
         }, $dataSets);
 
-        $this->writeRequest($className, 'QueryRequest', '', '', '', '', '');
-        $this->writeRequest($className, 'UpsertRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages']);
+        $this->writeRequest($className, 'QueryRequest', '', '', '', '', '', $outDir);
+        $this->writeRequest($className, 'UpsertRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages'], $outDir);
     }
 
-    private function writeRequest($className, $suffix, $required, $properties, $consts, $rules, $messages): void
+    private function writeRequest($className, $suffix, $required, $properties, $consts, $rules, $messages, $outDir): void
     {
         $config = config('devtools');
         if ($config['multi_module']) {
@@ -127,8 +132,8 @@ class GenController extends Command
             $dist = app_path('Modules/'.$groupName.'/Http/Requests/'.$className);
             $namespace = "App\\Modules\\$groupName\\Http";
         } else {
-            $dist = app_path('Http/Requests/'.$className);
-            $namespace = 'App\\Http';
+            $dist = app_path('API/'.$outDir.'/Requests/'.$className);
+            $namespace = 'App\\API\\'.$outDir;
         }
 
         $this->ensureDirectoryExists($dist);
@@ -149,7 +154,7 @@ class GenController extends Command
             ->generate();
     }
 
-    private function responseTpl(string $className, array $columns): void
+    private function responseTpl(string $className, array $columns, string $outDir): void
     {
         $config = config('devtools');
         if ($config['multi_module']) {
@@ -157,8 +162,8 @@ class GenController extends Command
             $dist = app_path('Modules/'.$groupName.'/Http/Responses/'.$className);
             $namespace = "App\\Modules\\$groupName\\Http";
         } else {
-            $dist = app_path('Http/Responses/'.$className);
-            $namespace = 'App\\Http';
+            $dist = app_path('API/'.$outDir.'/Responses/'.$className);
+            $namespace = 'App\\API\\'.$outDir;
         }
 
         $this->ensureDirectoryExists($dist);

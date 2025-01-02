@@ -106,14 +106,14 @@ class GenController extends Command
             $dataSets['required'] .= "        self::get{$classCamelName},\n";
             $dataSets['properties'] .= "        new OA\Property(property: self::get{$classCamelName}, description: '{$column['comment']}', type: '{$column['swagger_type']}'),\n";
             $dataSets['consts'] .= "    const string get{$classCamelName} = '{$column['name']}';\n\n";
-            $dataSets['rules'] .= "            self::get{$classCamelName} => 'require',\n";
+            $dataSets['rules'] .= "            self::get{$classCamelName} => 'required',\n";
 
             $column['comment'] = Str::replace([':', '：'], ':', $column['comment']);
             $endPosition = Str::position($column['comment'], ':');
             if ($endPosition !== false) {
                 $column['comment'] = Str::substr($column['comment'], 0, $endPosition);
             }
-            $dataSets['messages'] .= "            self::get{$classCamelName}.'.require' => '请设置{$column['comment']}',\n";
+            $dataSets['messages'] .= "            self::get{$classCamelName}.'.required' => '请设置{$column['comment']}',\n";
         }
 
         $dataSets = array_map(function ($item) {

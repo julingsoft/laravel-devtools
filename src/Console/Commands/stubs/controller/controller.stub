@@ -43,6 +43,9 @@ class {{ className }}Controller extends Controller
 
             ${{ classCamelName }}BundleService = new {{ className }}BundleService;
             $result = ${{ classCamelName }}BundleService->page($condition, $page, $pageSize);
+            if (empty($result)) {
+                return $this->success();
+            }
 
             foreach ($result['data'] as $key => $item) {
                 $response = new {{ className }}Response($item);

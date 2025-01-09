@@ -18,7 +18,7 @@ class GenController extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:controller {outDir=v1} {--prefix=} {--table=}';
+    protected $signature = 'gen:controller {outDir=v1} {--prefix=} {--table=} {--force=}';
 
     /**
      * The console command description.
@@ -62,50 +62,38 @@ class GenController extends Command
             $namespace = $baseNamespace.'\\API\\'.$outDir;
         }
 
-        $this->ensureDirectoryExists($dist);
-        GenerateStub::from(__DIR__.'/stubs/controller/controller.stub')
-            ->to($dist)
-            ->name($className.'Controller')
-            ->ext('php')
-            ->replaces([
-                'namespace' => $namespace,
-                'baseNamespace' => $baseNamespace,
-                'className' => $className,
-                'groupName' => $groupName,
-                'classCamelName' => Str::camel($className),
-                'comment' => $comment,
-            ])
-            ->generate();
+        $controllerFile = $dist.'/'.$className.'Controller.php';
+        if (! file_exists($controllerFile) || $this->option('force')) {
+            $this->ensureDirectoryExists($dist);
+            GenerateStub::from(__DIR__.'/stubs/controller/controller.stub')
+                ->to($dist)
+                ->name($className.'Controller')
+                ->ext('php')
+                ->replaces([
+                    'namespace' => $namespace,
+                    'baseNamespace' => $baseNamespace,
+                    'className' => $className,
+                    'groupName' => $groupName,
+                    'classCamelName' => Str::camel($className),
+                    'comment' => $comment,
+                ])
+                ->generate();
+        }
     }
 
     private function requestTpl(string $className, array $columns, string $outDir): void
     {
-        $ignoreFields = ['created_at', 'updated_at', 'deleted_at'];
-        $dataSets = ['required' => '', 'properties' => '', 'consts' => '', 'rules' => '', 'messages' => ''];
+        $ignoreFields = ['id', 'created_at', 'updated_at', 'deleted_at'];
+        $dataSets = ['required' => '', 'properties' => '', 'constants' => '', 'rules' => '', 'messages' => ''];
 
         foreach ($columns as $column) {
             if (in_array($column['name'], $ignoreFields)) {
                 continue;
             }
-            if ($column['name'] === 'default') {
-                $column['name'] = 'isDefault';
-            }
-            if ($column['name'] === 'id' && empty($column['comment'])) {
-                $column['comment'] = 'ID';
-            }
-            if ($column['name'] === 'created_at' && empty($column['comment'])) {
-                $column['comment'] = '创建时间';
-            }
-            if ($column['name'] === 'updated_at' && empty($column['comment'])) {
-                $column['comment'] = '更新时间';
-            }
-            if ($column['name'] === 'deleted_at' && empty($column['comment'])) {
-                $column['comment'] = '删除时间';
-            }
             $classCamelName = Str::studly($column['name']);
             $dataSets['required'] .= "        self::get{$classCamelName},\n";
             $dataSets['properties'] .= "        new OA\Property(property: self::get{$classCamelName}, description: '{$column['comment']}', type: '{$column['swagger_type']}'),\n";
-            $dataSets['consts'] .= "    const string get{$classCamelName} = '{$column['name']}';\n\n";
+            $dataSets['constants'] .= "    const string get{$classCamelName} = '{$column['name']}';\n\n";
             $dataSets['rules'] .= "            self::get{$classCamelName} => 'required',\n";
 
             $column['comment'] = Str::replace([':', '：'], ':', $column['comment']);
@@ -121,10 +109,10 @@ class GenController extends Command
         }, $dataSets);
 
         $this->writeRequest($className, 'QueryRequest', '', '', '', '', '', $outDir);
-        $this->writeRequest($className, 'UpsertRequest', $dataSets['required'], $dataSets['properties'], $dataSets['consts'], $dataSets['rules'], $dataSets['messages'], $outDir);
+        $this->writeRequest($className, 'UpsertRequest', $dataSets['required'], $dataSets['properties'], $dataSets['constants'], $dataSets['rules'], $dataSets['messages'], $outDir);
     }
 
-    private function writeRequest($className, $suffix, $required, $properties, $consts, $rules, $messages, $outDir): void
+    private function writeRequest($className, $suffix, $required, $properties, $constants, $rules, $messages, $outDir): void
     {
         $config = config('devtools');
         if ($config['multi_module']) {
@@ -136,22 +124,25 @@ class GenController extends Command
             $namespace = 'App\\API\\'.$outDir;
         }
 
-        $this->ensureDirectoryExists($dist);
-        GenerateStub::from(__DIR__.'/stubs/request/request.stub')
-            ->to($dist)
-            ->name($className.$suffix)
-            ->ext('php')
-            ->replaces([
-                'namespace' => $namespace,
-                'className' => $className,
-                'schema' => $className.$suffix,
-                'dataSets[required]' => $required,
-                'dataSets[properties]' => $properties,
-                'dataSets[consts]' => $consts,
-                'dataSets[rules]' => $rules,
-                'dataSets[messages]' => $messages,
-            ])
-            ->generate();
+        $requestFile = $dist.'/'.$className.$suffix.'.php';
+        if (! file_exists($requestFile) || $this->option('force')) {
+            $this->ensureDirectoryExists($dist);
+            GenerateStub::from(__DIR__.'/stubs/request/request.stub')
+                ->to($dist)
+                ->name($className.$suffix)
+                ->ext('php')
+                ->replaces([
+                    'namespace' => $namespace,
+                    'className' => $className,
+                    'schema' => $className.$suffix,
+                    'dataSets[required]' => $required,
+                    'dataSets[properties]' => $properties,
+                    'dataSets[constants]' => $constants,
+                    'dataSets[rules]' => $rules,
+                    'dataSets[messages]' => $messages,
+                ])
+                ->generate();
+        }
     }
 
     private function responseTpl(string $className, array $columns, string $outDir): void
@@ -168,65 +159,75 @@ class GenController extends Command
 
         $this->ensureDirectoryExists($dist);
 
-        GenerateStub::from(__DIR__.'/stubs/response/query.stub')
-            ->to($dist)
-            ->name($className.'QueryResponse')
-            ->ext('php')
-            ->replaces([
-                'namespace' => $namespace,
-                'className' => $className,
-            ])
-            ->generate();
+        $responseFile = $dist.'/'.$className.'QueryResponse.php';
+        if (! file_exists($responseFile) || $this->option('force')) {
+            GenerateStub::from(__DIR__.'/stubs/response/query.stub')
+                ->to($dist)
+                ->name($className.'QueryResponse')
+                ->ext('php')
+                ->replaces([
+                    'namespace' => $namespace,
+                    'className' => $className,
+                ])
+                ->generate();
+        }
 
-        GenerateStub::from(__DIR__.'/stubs/response/destroy.stub')
-            ->to($dist)
-            ->name($className.'DestroyResponse')
-            ->ext('php')
-            ->replaces([
-                'namespace' => $namespace,
-                'className' => $className,
-            ])
-            ->generate();
+        $responseFile = $dist.'/'.$className.'DestroyResponse.php';
+        if (! file_exists($responseFile) || $this->option('force')) {
+            GenerateStub::from(__DIR__.'/stubs/response/destroy.stub')
+                ->to($dist)
+                ->name($className.'DestroyResponse')
+                ->ext('php')
+                ->replaces([
+                    'namespace' => $namespace,
+                    'className' => $className,
+                ])
+                ->generate();
+        }
 
         $ignoreFields = ['deleted_time', 'password', 'password_salt'];
 
         $fields = "\n";
+        $methods = "\n";
         foreach ($columns as $column) {
             if (in_array($column['name'], $ignoreFields)) {
                 continue;
             }
 
-            if ($column['name'] === 'default') {
-                $column['name'] = 'isDefault';
-            }
             if ($column['name'] === 'id' && empty($column['comment'])) {
                 $column['comment'] = 'ID';
             }
-            $column['name'] = Str::camel($column['name']);
-            $fields .= "    #[OA\Property(property: '{$column['name']}', description: '{$column['comment']}', type: '{$column['swagger_type']}')]\n";
-            $fields .= '    private '.$column['base_type'].' $'.$column['name'].";\n\n";
-        }
-
-        foreach ($columns as $column) {
-            if (in_array($column['name'], $ignoreFields)) {
-                continue;
+            if ($column['name'] === 'created_at' && empty($column['comment'])) {
+                $column['comment'] = '创建时间';
+            }
+            if ($column['name'] === 'updated_at' && empty($column['comment'])) {
+                $column['comment'] = '更新时间';
+            }
+            if ($column['name'] === 'deleted_at' && empty($column['comment'])) {
+                $column['comment'] = '删除时间';
             }
 
-            $column['name'] = Str::camel($column['name']);
-            $fields .= $this->getSet($column['name'], $column['base_type'], $column['comment'])."\n\n";
+            $fields .= "    #[OA\Property(property: '{$column['camel_name']}', description: '{$column['comment']}', type: '{$column['swagger_type']}')]\n";
+            $fields .= '    private '.$column['base_type'].' $'.$column['camel_name'].";\n\n";
+            $methods .= $this->getSet($column['camel_name'], $column['base_type'], $column['comment'])."\n\n";
         }
 
         $fields = rtrim($fields, "\n");
+        $methods = rtrim($methods, "\n");
 
-        GenerateStub::from(__DIR__.'/stubs/response/response.stub')
-            ->to($dist)
-            ->name($className.'Response')
-            ->ext('php')
-            ->replaces([
-                'namespace' => $namespace,
-                'className' => $className,
-                'fields' => $fields,
-            ])
-            ->generate();
+        $responseFile = $dist.'/'.$className.'Response.php';
+        if (! file_exists($responseFile) || $this->option('force')) {
+            GenerateStub::from(__DIR__.'/stubs/response/response.stub')
+                ->to($dist)
+                ->name($className.'Response')
+                ->ext('php')
+                ->replaces([
+                    'namespace' => $namespace,
+                    'className' => $className,
+                    'fields' => $fields,
+                    'methods' => $methods,
+                ])
+                ->generate();
+        }
     }
 }

@@ -57,6 +57,8 @@ class GenEntity extends Command
         $this->ensureDirectoryExists($dist);
 
         $fields = "\n";
+        $methods = "\n";
+
         $className = Str::studly($this->getSingular($tableName));
         $columns = $this->getTableColumns($tableName);
         foreach ($columns as $column) {
@@ -68,9 +70,6 @@ class GenEntity extends Command
         }
 
         foreach ($columns as $column) {
-            if ($column['name'] === 'default') {
-                $column['name'] = 'isDefault';
-            }
             if ($column['name'] === 'id' && empty($column['comment'])) {
                 $column['comment'] = 'ID';
             }
@@ -83,15 +82,14 @@ class GenEntity extends Command
             if ($column['name'] === 'deleted_at' && empty($column['comment'])) {
                 $column['comment'] = '删除时间';
             }
+
             $fields .= "    #[OA\\Property(property: '{$column['camel_name']}', description: '{$column['comment']}', type: '{$column['swagger_type']}')]\n";
             $fields .= '    private '.$column['base_type'].' $'.$column['camel_name'].";\n\n";
-        }
-
-        foreach ($columns as $column) {
-            $fields .= $this->getSet($column['camel_name'], $column['base_type'], $column['comment'])."\n\n";
+            $methods .= $this->getSet($column['camel_name'], $column['base_type'], $column['comment'])."\n\n";
         }
 
         $fields = rtrim($fields, "\n");
+        $methods = rtrim($methods, "\n");
 
         GenerateStub::from(__DIR__.'/stubs/entity/entity.stub')
             ->to($dist)
@@ -101,6 +99,7 @@ class GenEntity extends Command
                 'namespace' => $namespace,
                 'className' => $className,
                 'fields' => $fields,
+                'methods' => $methods,
             ])
             ->generate();
     }

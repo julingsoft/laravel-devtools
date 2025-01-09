@@ -18,7 +18,7 @@ class GenView extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:view {--prefix=} {--table=}';
+    protected $signature = 'gen:view {--prefix=} {--table=} {--force=}';
 
     /**
      * The console command description.
@@ -53,15 +53,18 @@ class GenView extends Command
         $dist = resource_path('admin/src/views/'.Str::camel($groupName).'/'.Str::camel($className));
         $this->ensureDirectoryExists($dist);
 
-        GenerateStub::from(__DIR__.'/stubs/view/'.$view.'.stub')
-            ->to($dist)
-            ->name(Str::studly($view).'View')
-            ->ext('vue')
-            ->replaces([
-                'groupName' => $groupName,
-                'className' => $className,
-                'comment' => $comment,
-            ])
-            ->generate();
+        $viewFile = $dist.'/'.$className.'View.vue';
+        if (! file_exists($viewFile) || $this->option('force')) {
+            GenerateStub::from(__DIR__.'/stubs/view/'.$view.'.stub')
+                ->to($dist)
+                ->name($className.'View')
+                ->ext('vue')
+                ->replaces([
+                    'groupName' => $groupName,
+                    'className' => $className,
+                    'comment' => $comment,
+                ])
+                ->generate();
+        }
     }
 }

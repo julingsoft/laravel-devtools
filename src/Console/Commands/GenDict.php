@@ -16,7 +16,7 @@ class GenDict extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:dict';
+    protected $signature = 'gen:dict {--prefix=} {--table=}';
 
     /**
      * The console command description.
@@ -35,7 +35,7 @@ class GenDict extends Command
 
         $content = "# 数据字典\n\n";
 
-        $tables = $this->getTables();
+        $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
             $content .= "### {$table['comment']}(`{$table['name']}`)\n";
             $columns = $this->getTableColumns($table['name']);

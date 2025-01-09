@@ -12,4 +12,5 @@ class {{ className }}Response
 {
     use DTOHelper;
 {{ fields }}
+{{ methods }}
 }

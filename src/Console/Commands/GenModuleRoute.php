@@ -41,11 +41,14 @@ class GenModuleRoute extends Command
     {
         $modules = glob(app_path('Modules/*'), GLOB_ONLYDIR);
         foreach ($modules as $modulePath) {
+            $dist = $modulePath.'/Routes';
+            $this->ensureDirectoryExists($dist);
+
             $module = basename($modulePath);
             $controllers = glob($modulePath.'/Controllers/*Controller.php');
             $routes = $this->getRouteContent(Str::camel($module), $this->getRoutes($controllers));
-            $this->ensureDirectoryExists($modulePath.'/Routes');
-            file_put_contents($modulePath.'/Routes/api.php', $this->getTemplate($routes));
+
+            file_put_contents($dist.'/api.php', $this->getTemplate($routes));
         }
     }
 

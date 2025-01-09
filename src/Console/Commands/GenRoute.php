@@ -41,14 +41,16 @@ class GenRoute extends Command
     {
         $dirs = glob(app_path('API/*'), GLOB_ONLYDIR);
         foreach ($dirs as $dir) {
+            $dist = $dir.'/Routes';
+            $this->ensureDirectoryExists($dist);
+
             $module = basename($dir);
-            $files = array_merge(
+            $routes = $this->getRoutes(array_merge(
                 glob($dir.'/Controllers/*Controller.php'),
                 glob(app_path('Bundles/*/Controllers/'.$module.'/*Controller.php'))
-            );
-            $routes = $this->getRoutes($files);
-            $this->ensureDirectoryExists($dir);
-            $this->genRoutes(Str::camel($module), $routes, $dir.'/Routes/api.php');
+            ));
+
+            $this->genRoutes(Str::camel($module), $routes, $dist.'/api.php');
         }
     }
 

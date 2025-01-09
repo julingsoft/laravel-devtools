@@ -60,8 +60,13 @@ class GenEnums extends Command
                 $enumsClass = Str::studly($this->getSingular($column['name']));
                 $comment = Str::replace('：', ':', $column['comment']);
                 $comment = Str::replace('，', ',', $comment);
-                [$enumsName, $enumsOptions] = explode(':', $comment);
 
+                $split = explode(':', $comment);
+                if (count($split) < 2) {
+                    continue;
+                }
+
+                [$enumsName, $enumsOptions] = $split;
                 $enumsOptions = explode(',', $enumsOptions);
                 $enumsOptions = array_map(function ($enumsOption) {
                     if (Str::contains($enumsOption, '-')) {
@@ -91,14 +96,13 @@ EOF;
                     }
                 }
 
-                $className = $className.$enumsClass;
                 GenerateStub::from(__DIR__.'/stubs/enums/enums.stub')
                     ->to($dist)
-                    ->name($className.'Enum')
+                    ->name($className.$enumsClass.'Enum')
                     ->ext('php')
                     ->replaces([
                         'namespace' => $namespace,
-                        'className' => $className,
+                        'className' => $className.$enumsClass,
                         'comment' => $enumsName,
                         'enums' => $enums,
                         'enumsType' => $enumsType,

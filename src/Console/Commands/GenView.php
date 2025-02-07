@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\SchemaTrait;
+use Juling\Foundation\Support\StrHelper;
 
 class GenView extends Command
 {
@@ -36,7 +37,7 @@ class GenView extends Command
         foreach ($tables as $table) {
             $tableName = $table['name'];
             $className = Str::studly($this->getSingular($tableName));
-            $comment = Str::rtrim($table['comment'], '表').'模块';
+            $comment = StrHelper::rtrim($table['comment'], '表').'模块';
 
             $columns = $this->getTableColumns($table['name']);
             $this->tpl($className, $comment, 'index');

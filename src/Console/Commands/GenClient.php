@@ -36,7 +36,7 @@ class GenClient extends Command
      */
     public function handle(): void
     {
-        $files = glob(public_path('openapi/*.json'));
+        $files = glob(base_path('docs/api/*.json'));
         foreach ($files as $file) {
             $serviceName = basename(dirname(__DIR__, 7));
             $serviceName = Str::studly(Arr::last(explode('-', $serviceName)));

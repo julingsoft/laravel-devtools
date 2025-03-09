@@ -31,7 +31,7 @@ trait SchemaTrait
 
         $tables = Schema::getTables();
         foreach ($tables as $key => $table) {
-            if (in_array($table['name'], $this->ignoreTables)) {
+            if (in_array($table['name'], $this->ignoreTables) || $table['schema'] !== config('database.connections.mysql.database')) {
                 unset($tables[$key]);
             }
 

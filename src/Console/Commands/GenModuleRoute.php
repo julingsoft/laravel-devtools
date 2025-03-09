@@ -45,10 +45,10 @@ class GenModuleRoute extends Command
             $this->ensureDirectoryExists($dist);
 
             $module = basename($modulePath);
-            $controllers = glob($modulePath.'/Controllers/*Controller.php');
+            $controllers = glob($modulePath.'/Http/Controllers/*Controller.php');
             $routes = $this->getRouteContent(Str::camel($module), $this->getRoutes($controllers));
 
-            file_put_contents($dist.'/api.php', $this->getTemplate($routes));
+            file_put_contents($dist.'/route.php', $this->getTemplate($routes));
         }
     }
 
@@ -114,7 +114,7 @@ class GenModuleRoute extends Command
             $routeContent .= "\n    Route::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";
             if ($route['httpMethod'] === 'get') {
                 $name = Str::replace('/', '.', $route['path']);
-                $routeContent .= "->name('$name')";
+                // $routeContent .= "->name('$name')";
             }
             $routeContent .= ';';
         }

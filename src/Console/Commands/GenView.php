@@ -53,7 +53,7 @@ class GenView extends Command
         $className = Str::ltrim($className, $groupName);
 
         $devConfig = new DevConfig();
-        $dist = $devConfig->getDist(__CLASS__.'/src/views/'.Str::camel($groupName).'/'.Str::camel($className));
+        $dist = $devConfig->getDist(basename(__CLASS__).'/src/views/'.Str::camel($groupName).'/'.Str::camel($className));
         $this->ensureDirectoryExists($dist);
 
         $viewFile = $dist.'/'.$className.'View.vue';

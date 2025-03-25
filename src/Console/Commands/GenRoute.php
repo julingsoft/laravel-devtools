@@ -45,7 +45,7 @@ class GenRoute extends Command
         foreach ($dirs as $dir) {
             $module = basename($dir);
 
-            $dist =$devConfig->getDist(__CLASS__.'/'.$module.'/Routes');
+            $dist =$devConfig->getDist(basename(__CLASS__).'/'.$module.'/Routes');
             $this->ensureDirectoryExists($dist);
 
             $routes = $this->getRoutes(array_merge(

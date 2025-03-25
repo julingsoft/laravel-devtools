@@ -49,10 +49,10 @@ class GenEntity extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
-            $dist = $devConfig->getDist(__CLASS__.'/Modules/'.$groupName.'/Entities');
+            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Entities');
             $namespace = "App\\Modules\\$groupName";
         } else {
-            $dist = $devConfig->getDist(__CLASS__.'/Entities');
+            $dist = $devConfig->getDist(basename(__CLASS__).'/Entities');
             $namespace = 'App';
         }
         $this->ensureDirectoryExists($dist);

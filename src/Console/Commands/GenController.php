@@ -55,11 +55,11 @@ class GenController extends Command
 
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
-            $dist = $devConfig->getDist(__CLASS__.'/Modules/'.$groupName.'/Http/Controllers');
+            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Http/Controllers');
             $baseNamespace = "App\\Modules\\$groupName";
             $namespace = $baseNamespace.'\\Http';
         } else {
-            $dist = $devConfig->getDist(__CLASS__.'/API/'.$outDir.'/Controllers');
+            $dist = $devConfig->getDist(basename(__CLASS__).'/API/'.$outDir.'/Controllers');
             $baseNamespace = 'App';
             $namespace = $baseNamespace.'\\API\\'.$outDir;
         }
@@ -119,10 +119,10 @@ class GenController extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName(Str::snake($className));
-            $dist = $devConfig->getDist(__CLASS__.'/Modules/'.$groupName.'/Http/Requests/'.$className);
+            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Http/Requests/'.$className);
             $namespace = "App\\Modules\\$groupName\\Http";
         } else {
-            $dist = $devConfig->getDist(__CLASS__.'/API/'.$outDir.'/Requests/'.$className);
+            $dist = $devConfig->getDist(basename(__CLASS__).'/API/'.$outDir.'/Requests/'.$className);
             $namespace = 'App\\API\\'.$outDir;
         }
 
@@ -152,10 +152,10 @@ class GenController extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName(Str::snake($className));
-            $dist = $devConfig->getDist(__CLASS__.'/Modules/'.$groupName.'/Http/Responses/'.$className);
+            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Http/Responses/'.$className);
             $namespace = "App\\Modules\\$groupName\\Http";
         } else {
-            $dist = $devConfig->getDist(__CLASS__.'/API/'.$outDir.'/Responses/'.$className);
+            $dist = $devConfig->getDist(basename(__CLASS__).'/API/'.$outDir.'/Responses/'.$className);
             $namespace = 'App\\API\\'.$outDir;
         }
         $this->ensureDirectoryExists($dist);

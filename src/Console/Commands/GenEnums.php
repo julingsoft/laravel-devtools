@@ -47,10 +47,10 @@ class GenEnums extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
-            $dist = $devConfig->getDist(__CLASS__.'/Modules/'.$groupName.'/Enums');
+            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Enums');
             $namespace = "App\\Modules\\$groupName";
         } else {
-            $dist = $devConfig->getDist(__CLASS__.'/Enums');
+            $dist = $devConfig->getDist(basename(__CLASS__).'/Enums');
             $namespace = 'App';
         }
         $this->ensureDirectoryExists($dist);

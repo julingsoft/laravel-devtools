@@ -47,7 +47,7 @@ class GenClient extends Command
             $serviceName = Str::studly(Arr::last(explode('-', $serviceName)));
             $moduleName = Str::studly(basename($file, '.json'));
 
-            $this->dist = $devConfig->getDist(__CLASS__.'/'.$serviceName.'/'.$moduleName);
+            $this->dist = $devConfig->getDist(basename(__CLASS__).'/'.$serviceName.'/'.$moduleName);
             $this->ensureDirectoryExists($this->dist.'/Model');
 
             $data = json_decode(file_get_contents($file), true);

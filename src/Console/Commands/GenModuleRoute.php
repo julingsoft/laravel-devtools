@@ -45,7 +45,7 @@ class GenModuleRoute extends Command
         foreach ($modules as $modulePath) {
             $module = basename($modulePath);
 
-            $dist = $devConfig->getDist(__CLASS__.'/'.$module.'/Routes');
+            $dist = $devConfig->getDist(basename(__CLASS__).'/'.$module.'/Routes');
             $this->ensureDirectoryExists($dist);
 
             $controllers = glob($modulePath.'/Http/Controllers/*Controller.php');

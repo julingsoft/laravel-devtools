@@ -6,9 +6,13 @@ namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Juling\DevTools\Support\DevConfig;
+use Juling\DevTools\Support\SchemaTrait;
 
 class GenTypescript extends Command
 {
+    use SchemaTrait;
+
     /**
      * The name and signature of the console command.
      *
@@ -28,22 +32,19 @@ class GenTypescript extends Command
      */
     public function handle(): void
     {
+        $devConfig = new DevConfig();
         $files = glob(base_path('docs/api/*.json'));
         foreach ($files as $file) {
             $module = basename($file, '.json');
             $data = json_decode(file_get_contents($file), true);
 
-            $servicePath = resource_path('ts/services');
-            if (! is_dir($servicePath)) {
-                mkdir($servicePath, 0755, true);
-            }
+            $servicePath = $devConfig->getDist(__CLASS__.'/ts/services');
+            $this->ensureDirectoryExists($servicePath);
             $serviceContent = $this->genServices($data, $module);
             file_put_contents($servicePath.'/'.$module.'.ts', $serviceContent);
 
-            $typePath = resource_path('ts/types');
-            if (! is_dir($typePath)) {
-                mkdir($typePath, 0755, true);
-            }
+            $typePath = $devConfig->getDist(__CLASS__.'/ts/types');
+            $this->ensureDirectoryExists($typePath);
             $typeContent = $this->genTypes($data, $module);
             file_put_contents($typePath.'/'.$module.'.d.ts', $typeContent);
         }

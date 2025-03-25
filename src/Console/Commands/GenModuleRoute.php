@@ -7,6 +7,7 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
 use ReflectionClass;
 use ReflectionException;
@@ -39,12 +40,14 @@ class GenModuleRoute extends Command
      */
     public function handle(): void
     {
+        $devConfig = new DevConfig();
         $modules = glob(app_path('Modules/*'), GLOB_ONLYDIR);
         foreach ($modules as $modulePath) {
-            $dist = $modulePath.'/Routes';
+            $module = basename($modulePath);
+
+            $dist = $devConfig->getDist(__CLASS__.'/'.$module.'/Routes');
             $this->ensureDirectoryExists($dist);
 
-            $module = basename($modulePath);
             $controllers = glob($modulePath.'/Http/Controllers/*Controller.php');
             $routes = $this->getRouteContent(Str::camel($module), $this->getRoutes($controllers));
 

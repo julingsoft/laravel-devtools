@@ -7,6 +7,7 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Juling\DevTools\Facades\GenerateStub;
+use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
 
 class GenService extends Command
@@ -44,13 +45,13 @@ class GenService extends Command
 
     private function serviceTpl(string $className, string $tableName): void
     {
-        $config = config('devtools');
-        if ($config['multi_module']) {
+        $devConfig = new DevConfig();
+        if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
-            $dist = app_path('Modules/'.$groupName.'/Services');
+            $dist = $devConfig->getDist(__CLASS__.'/Modules/'.$groupName.'/Services');
             $namespace = "App\\Modules\\$groupName";
         } else {
-            $dist = app_path('Services');
+            $dist = $devConfig->getDist(__CLASS__.'/Services');
             $namespace = 'App';
         }
         $this->ensureDirectoryExists($dist);
@@ -68,13 +69,13 @@ class GenService extends Command
 
     private function bundleTpl(string $className, string $tableName): void
     {
+        $devConfig = new DevConfig();
         $groupName = $this->getTableGroupName($tableName);
         $namespace = "App\\Bundles\\$groupName";
-        $dist = app_path('Bundles/'.$groupName.'/Services');
+        $dist = $devConfig->getDist(__CLASS__.'/Bundles/'.$groupName.'/Services');
         $this->ensureDirectoryExists($dist);
 
-        $config = config('devtools');
-        if ($config['multi_module']) {
+        if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
             $useNamespace = "App\\Modules\\$groupName";
         } else {

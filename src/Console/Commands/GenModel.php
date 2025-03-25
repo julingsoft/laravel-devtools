@@ -7,6 +7,7 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Juling\DevTools\Facades\GenerateStub;
+use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
 
 class GenModel extends Command
@@ -49,13 +50,13 @@ class GenModel extends Command
 
     private function modelTpl(string $className, string $tableName): void
     {
-        $config = config('devtools');
-        if ($config['multi_module']) {
+        $devConfig = new DevConfig();
+        if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
-            $dist = app_path('Modules/'.$groupName.'/Models');
+            $dist = $devConfig->getDist(__CLASS__.'/Modules/'.$groupName.'/Models');
             $namespace = "App\\Modules\\$groupName";
         } else {
-            $dist = app_path('Models');
+            $dist = $devConfig->getDist(__CLASS__.'/Models');
             $namespace = 'App';
         }
         $this->ensureDirectoryExists($dist);

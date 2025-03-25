@@ -7,6 +7,7 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Juling\DevTools\Facades\GenerateStub;
+use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
 use Juling\Foundation\Support\StrHelper;
 
@@ -45,16 +46,15 @@ class GenEntity extends Command
 
     private function entityTpl(string $tableName): void
     {
-        $config = config('devtools');
-        if ($config['multi_module']) {
+        $devConfig = new DevConfig();
+        if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
-            $dist = app_path('Modules/'.$groupName.'/Entities');
+            $dist = $devConfig->getDist(__CLASS__.'/Modules/'.$groupName.'/Entities');
             $namespace = "App\\Modules\\$groupName";
         } else {
-            $dist = app_path('Entities');
+            $dist = $devConfig->getDist(__CLASS__.'/Entities');
             $namespace = 'App';
         }
-
         $this->ensureDirectoryExists($dist);
 
         $fields = "\n";

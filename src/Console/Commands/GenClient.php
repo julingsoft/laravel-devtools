@@ -7,9 +7,13 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Juling\DevTools\Support\DevConfig;
+use Juling\DevTools\Support\SchemaTrait;
 
 class GenClient extends Command
 {
+    use SchemaTrait;
+
     /**
      * The name and signature of the console command.
      *
@@ -36,16 +40,15 @@ class GenClient extends Command
      */
     public function handle(): void
     {
+        $devConfig = new DevConfig();
         $files = glob(base_path('docs/api/*.json'));
         foreach ($files as $file) {
             $serviceName = basename(dirname(__DIR__, 7));
             $serviceName = Str::studly(Arr::last(explode('-', $serviceName)));
             $moduleName = Str::studly(basename($file, '.json'));
 
-            $this->dist = resource_path("client/$serviceName/$moduleName");
-            if (!is_dir($this->dist.'/Model')) {
-                mkdir($this->dist.'/Model', 0777, true);
-            }
+            $this->dist = $devConfig->getDist(__CLASS__.'/'.$serviceName.'/'.$moduleName);
+            $this->ensureDirectoryExists($this->dist.'/Model');
 
             $data = json_decode(file_get_contents($file), true);
             $this->genModels($serviceName, $moduleName, $data);

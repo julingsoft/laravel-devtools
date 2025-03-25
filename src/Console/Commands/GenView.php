@@ -7,6 +7,7 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Juling\DevTools\Facades\GenerateStub;
+use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
 use Juling\Foundation\Support\StrHelper;
 
@@ -51,7 +52,8 @@ class GenView extends Command
         $groupName = $this->getTableGroupName(Str::snake($className));
         $className = Str::ltrim($className, $groupName);
 
-        $dist = resource_path('admin/src/views/'.Str::camel($groupName).'/'.Str::camel($className));
+        $devConfig = new DevConfig();
+        $dist = $devConfig->getDist(__CLASS__.'/src/views/'.Str::camel($groupName).'/'.Str::camel($className));
         $this->ensureDirectoryExists($dist);
 
         $viewFile = $dist.'/'.$className.'View.vue';

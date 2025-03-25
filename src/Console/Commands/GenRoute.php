@@ -7,6 +7,7 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
 use ReflectionClass;
 use ReflectionException;
@@ -39,12 +40,14 @@ class GenRoute extends Command
      */
     public function handle(): void
     {
+        $devConfig = new DevConfig();
         $dirs = glob(app_path('API/*'), GLOB_ONLYDIR);
         foreach ($dirs as $dir) {
-            $dist = $dir.'/Routes';
+            $module = basename($dir);
+
+            $dist =$devConfig->getDist(__CLASS__.'/'.$module.'/Routes');
             $this->ensureDirectoryExists($dist);
 
-            $module = basename($dir);
             $routes = $this->getRoutes(array_merge(
                 glob($dir.'/Controllers/*Controller.php'),
                 glob(app_path('Bundles/*/Controllers/'.$module.'/*Controller.php'))

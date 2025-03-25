@@ -6,6 +6,7 @@ namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
+use Juling\DevTools\Support\DevConfig;
 
 class InitCommand extends Command
 {
@@ -25,9 +26,10 @@ class InitCommand extends Command
 
     public function handle(): void
     {
+        $devConfig = new DevConfig();
+
         $fs = new Filesystem;
         $fs->ensureDirectoryExists(base_path('docs/api'));
-        $fs->ensureDirectoryExists(resource_path('ts/services'));
-        $fs->ensureDirectoryExists(resource_path('ts/types'));
+        $fs->ensureDirectoryExists($devConfig->getDist());
     }
 }

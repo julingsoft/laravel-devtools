@@ -53,7 +53,7 @@ class GenRoute extends Command
                 glob(app_path('Bundles/*/Controllers/'.$module.'/*Controller.php'))
             ));
 
-            $this->genRoutes(Str::camel($module), $routes, $dist.'/api.php');
+            $this->genRoutes(Str::camel($module), $routes, $dist.'/route.php');
         }
     }
 

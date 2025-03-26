@@ -43,8 +43,8 @@ class GenClient extends Command
         $devConfig = new DevConfig();
         $files = glob(base_path('docs/api/*.json'));
         foreach ($files as $file) {
-            $serviceName = basename(dirname(__DIR__, 7));
-            $serviceName = Str::studly(Arr::last(explode('-', $serviceName)));
+            $serviceName = basename(dirname(__DIR__, 6));
+            $serviceName = Str::studly($serviceName);
             $moduleName = Str::studly(basename($file, '.json'));
 
             $this->dist = $devConfig->getDist('resources/client/'.$serviceName.'/'.$moduleName);
@@ -54,7 +54,7 @@ class GenClient extends Command
             $this->genModels($serviceName, $moduleName, $data);
 
             $content = $this->genClient($serviceName, $moduleName, $data);
-            file_put_contents("$this->dist/{$serviceName}Svc.php", $content);
+            file_put_contents("$this->dist/{$serviceName}{$moduleName}Svc.php", $content);
         }
     }
 
@@ -71,7 +71,7 @@ use Exception;
 use Client\Support\SvcClient;
 {{ using }}
 
-class {$serviceName}Svc
+class {$serviceName}{$moduleName}Svc
 {
     use SvcClient;
 \n
@@ -160,6 +160,7 @@ EOF;
 
                     $svc = Str::camel($serviceName);
                     $svcMethod = Str::camel(Str::replace('/', ' ', $path));
+                    $mod = Str::camel($moduleName);
 
                     $apis[] = "    /**
      * [{$val['tags'][0]}] {$val['summary']}
@@ -168,7 +169,7 @@ EOF;
      */
     public function {$svcMethod}({$requestParams}): {$response}
     {
-        \$url = '/api/{$svc}/v1{$path}';
+        \$url = '/api/{$mod}{$path}';
         \$result = \$this->svc('{$svc}')->{$method}(\$url{$requestBody})->json();
         if (\$result['code'] !== 0) {
             throw new Exception(\$result['message']);

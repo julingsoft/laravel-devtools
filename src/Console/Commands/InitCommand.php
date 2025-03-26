@@ -27,9 +27,16 @@ class InitCommand extends Command
     public function handle(): void
     {
         $devConfig = new DevConfig();
+        $dist = $devConfig->getDist();
 
         $fs = new Filesystem;
+        if ($fs->exists($dist)) {
+            $fs->deleteDirectories($dist);
+        }
         $fs->ensureDirectoryExists(base_path('docs/api'));
-        $fs->ensureDirectoryExists($devConfig->getDist());
+        $fs->ensureDirectoryExists($dist);
+        if (stripos($dist, storage_path()) !== false) {
+            copy(storage_path('logs/.gitignore'), $dist.'/.gitignore');
+        }
     }
 }

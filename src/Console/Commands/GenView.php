@@ -36,35 +36,38 @@ class GenView extends Command
     {
         $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
-            $tableName = $table['name'];
-            $className = Str::studly($this->getSingular($tableName));
-            $comment = StrHelper::rtrim($table['comment'], '表').'模块';
+            $tableName = Str::studly($this->getSingular($table['name']));
+            $groupName = $this->getTableGroupName(Str::snake($tableName));
+            $viewName = Str::ltrim($tableName, $groupName);
 
+            $comment = StrHelper::rtrim($table['comment'], '表').'模块';
             $columns = $this->getTableColumns($table['name']);
-            $this->tpl($className, $comment, 'index');
-            $this->tpl($className, $comment, 'create');
-            $this->tpl($className, $comment, 'edit');
+
+            $this->tpl($groupName, $viewName, $viewName.'Index', $comment, $columns, 'index');
+            $this->tpl($groupName, $viewName, $viewName.'Create', $comment, $columns, 'create');
+            $this->tpl($groupName, $viewName, $viewName.'Edit', $comment, $columns, 'edit');
         }
     }
 
-    private function tpl(string $className, string $comment, string $view): void
+    private function tpl(string $groupName, string $viewName, string $distName, string $comment, array $columns, string $view): void
     {
-        $groupName = $this->getTableGroupName(Str::snake($className));
-        $className = Str::ltrim($className, $groupName);
-
+        dump($groupName, $viewName, $distName);
         $devConfig = new DevConfig();
-        $dist = $devConfig->getDist('resources/ts/views/'.Str::camel($groupName).'/'.Str::camel($className));
+        $dist = $devConfig->getDist('resources/ts/views/'.Str::camel($groupName));
+        if (!empty($viewName)) {
+            $dist .= '/'.Str::camel($viewName);
+        }
         $this->ensureDirectoryExists($dist);
 
-        $viewFile = $dist.'/'.$className.'View.vue';
+        $viewFile = $dist.'/'.$distName.'View.vue';
         if (! file_exists($viewFile) || $this->option('force')) {
             GenerateStub::from(__DIR__.'/stubs/view/'.$view.'.stub')
                 ->to($dist)
-                ->name($className.'View')
+                ->name($distName.'View')
                 ->ext('vue')
                 ->replaces([
                     'groupName' => $groupName,
-                    'className' => $className,
+                    'className' => $viewName,
                     'comment' => $comment,
                 ])
                 ->generate();

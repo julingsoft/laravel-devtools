@@ -40,12 +40,11 @@ class GenModuleRoute extends Command
      */
     public function handle(): void
     {
-        $devConfig = new DevConfig();
         $modules = glob(app_path('Modules/*'), GLOB_ONLYDIR);
         foreach ($modules as $modulePath) {
             $module = basename($modulePath);
 
-            $dist = $devConfig->getDist('app/Modules/'.$module.'/Routes');
+            $dist = app_path('Modules/'.$module.'/Routes');
             $this->ensureDirectoryExists($dist);
 
             $controllers = glob($modulePath.'/Http/Controllers/*Controller.php');

@@ -32,18 +32,17 @@ class GenTypescript extends Command
      */
     public function handle(): void
     {
-        $devConfig = new DevConfig();
-        $files = glob(base_path('docs/api/*.json'));
+        $files = glob(public_path('docs/api/*.json'));
         foreach ($files as $file) {
             $module = basename($file, '.json');
             $data = json_decode(file_get_contents($file), true);
 
-            $servicePath = $devConfig->getDist('resources/ts/services');
+            $servicePath = resource_path('ts/services');
             $this->ensureDirectoryExists($servicePath);
             $serviceContent = $this->genServices($data, $module);
             file_put_contents($servicePath.'/'.$module.'.ts', $serviceContent);
 
-            $typePath = $devConfig->getDist('resources/ts/types');
+            $typePath = resource_path('ts/types');
             $this->ensureDirectoryExists($typePath);
             $typeContent = $this->genTypes($data, $module);
             file_put_contents($typePath.'/'.$module.'.d.ts', $typeContent);

@@ -40,12 +40,11 @@ class GenRoute extends Command
      */
     public function handle(): void
     {
-        $devConfig = new DevConfig();
         $dirs = glob(app_path('Api/*'), GLOB_ONLYDIR);
         foreach ($dirs as $dir) {
             $module = basename($dir);
 
-            $dist =$devConfig->getDist('app/Api/'.$module.'/Routes');
+            $dist = app_path('Api/'.$module.'/Routes');
             $this->ensureDirectoryExists($dist);
 
             $routes = $this->getRoutes(array_merge(

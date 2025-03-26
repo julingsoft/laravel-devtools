@@ -33,7 +33,7 @@ class InitCommand extends Command
         if ($fs->exists($dist)) {
             $fs->deleteDirectories($dist);
         }
-        $fs->ensureDirectoryExists(base_path('docs/api'));
+        $fs->ensureDirectoryExists(public_path('docs/api'));
         $fs->ensureDirectoryExists($dist);
         if (stripos($dist, storage_path()) !== false) {
             copy(storage_path('logs/.gitignore'), $dist.'/.gitignore');

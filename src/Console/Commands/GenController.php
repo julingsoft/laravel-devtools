@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
-use Juling\Foundation\Support\StrHelper;
+use Juling\DevTools\Support\StrHelper;
 
 class GenController extends Command
 {
@@ -55,13 +55,13 @@ class GenController extends Command
 
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Http/Controllers');
+            $dist = $devConfig->getDist('app/Modules/'.$groupName.'/Http/Controllers');
             $baseNamespace = "App\\Modules\\$groupName";
             $namespace = $baseNamespace.'\\Http';
         } else {
-            $dist = $devConfig->getDist(basename(__CLASS__).'/API/'.$outDir.'/Controllers');
+            $dist = $devConfig->getDist('app/Api/'.$outDir.'/Controllers');
             $baseNamespace = 'App';
-            $namespace = $baseNamespace.'\\API\\'.$outDir;
+            $namespace = $baseNamespace.'\\Api\\'.$outDir;
         }
 
         $controllerFile = $dist.'/'.$className.'Controller.php';
@@ -119,11 +119,11 @@ class GenController extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName(Str::snake($className));
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Http/Requests/'.$className);
+            $dist = $devConfig->getDist('app/Modules/'.$groupName.'/Http/Requests/'.$className);
             $namespace = "App\\Modules\\$groupName\\Http";
         } else {
-            $dist = $devConfig->getDist(basename(__CLASS__).'/API/'.$outDir.'/Requests/'.$className);
-            $namespace = 'App\\API\\'.$outDir;
+            $dist = $devConfig->getDist('app/Api/'.$outDir.'/Requests/'.$className);
+            $namespace = 'App\\Api\\'.$outDir;
         }
 
         $requestFile = $dist.'/'.$className.$suffix.'.php';
@@ -152,11 +152,11 @@ class GenController extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName(Str::snake($className));
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Http/Responses/'.$className);
+            $dist = $devConfig->getDist('app/Modules/'.$groupName.'/Http/Responses/'.$className);
             $namespace = "App\\Modules\\$groupName\\Http";
         } else {
-            $dist = $devConfig->getDist(basename(__CLASS__).'/API/'.$outDir.'/Responses/'.$className);
-            $namespace = 'App\\API\\'.$outDir;
+            $dist = $devConfig->getDist('app/Api/'.$outDir.'/Responses/'.$className);
+            $namespace = 'App\\Api\\'.$outDir;
         }
         $this->ensureDirectoryExists($dist);
 

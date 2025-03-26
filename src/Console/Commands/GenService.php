@@ -48,10 +48,10 @@ class GenService extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Services');
+            $dist = $devConfig->getDist('app/Modules/'.$groupName.'/Services');
             $namespace = "App\\Modules\\$groupName";
         } else {
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Services');
+            $dist = $devConfig->getDist('app/Services');
             $namespace = 'App';
         }
         $this->ensureDirectoryExists($dist);
@@ -72,7 +72,7 @@ class GenService extends Command
         $devConfig = new DevConfig();
         $groupName = $this->getTableGroupName($tableName);
         $namespace = "App\\Bundles\\$groupName";
-        $dist = $devConfig->getDist(basename(__CLASS__).'/Bundles/'.$groupName.'/Services');
+        $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Services');
         $this->ensureDirectoryExists($dist);
 
         if ($devConfig->getMultiModule()) {

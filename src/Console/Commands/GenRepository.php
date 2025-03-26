@@ -47,10 +47,10 @@ class GenRepository extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Repositories');
+            $dist = $devConfig->getDist('app/Modules/'.$groupName.'/Repositories');
             $namespace = "App\\Modules\\$groupName";
         } else {
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Repositories');
+            $dist = $devConfig->getDist('app/Repositories');
             $namespace = 'App';
         }
         $this->ensureDirectoryExists($dist);

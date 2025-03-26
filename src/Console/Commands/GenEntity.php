@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
-use Juling\Foundation\Support\StrHelper;
+use Juling\DevTools\Support\StrHelper;
 
 class GenEntity extends Command
 {
@@ -49,10 +49,10 @@ class GenEntity extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Entities');
+            $dist = $devConfig->getDist('app/Modules/'.$groupName.'/Entities');
             $namespace = "App\\Modules\\$groupName";
         } else {
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Entities');
+            $dist = $devConfig->getDist('app/Entities');
             $namespace = 'App';
         }
         $this->ensureDirectoryExists($dist);

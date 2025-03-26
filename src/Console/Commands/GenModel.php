@@ -53,10 +53,10 @@ class GenModel extends Command
         $devConfig = new DevConfig();
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($tableName);
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Modules/'.$groupName.'/Models');
+            $dist = $devConfig->getDist('app/Modules/'.$groupName.'/Models');
             $namespace = "App\\Modules\\$groupName";
         } else {
-            $dist = $devConfig->getDist(basename(__CLASS__).'/Models');
+            $dist = $devConfig->getDist('app/Models');
             $namespace = 'App';
         }
         $this->ensureDirectoryExists($dist);

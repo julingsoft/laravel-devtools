@@ -47,7 +47,7 @@ class GenClient extends Command
             $serviceName = Str::studly(Arr::last(explode('-', $serviceName)));
             $moduleName = Str::studly(basename($file, '.json'));
 
-            $this->dist = $devConfig->getDist(basename(__CLASS__).'/'.$serviceName.'/'.$moduleName);
+            $this->dist = $devConfig->getDist('resources/client/'.$serviceName.'/'.$moduleName);
             $this->ensureDirectoryExists($this->dist.'/Model');
 
             $data = json_decode(file_get_contents($file), true);
@@ -65,10 +65,10 @@ class GenClient extends Command
 
 declare(strict_types=1);
 
-namespace OpenAPI\\Client\\$serviceName\\$moduleName;
+namespace Client\\$serviceName\\$moduleName;
 
 use Exception;
-use OpenAPI\Client\Support\SvcClient;
+use Client\Support\SvcClient;
 {{ using }}
 
 class {$serviceName}Svc
@@ -180,7 +180,7 @@ EOF;
             }
 
             $models = array_map(function ($v) use ($serviceName, $moduleName) {
-                return "use OpenAPI\\Client\\$serviceName\\$moduleName\\Model\\".$v.';';
+                return "use Client\\$serviceName\\$moduleName\\Model\\".$v.';';
             }, array_unique($types));
             $content = str_replace('{{ using }}', implode("\n", $models), $content);
 
@@ -220,7 +220,7 @@ EOF;
 
 declare(strict_types=1);
 
-namespace OpenAPI\\Client\\$serviceName\\$moduleName\\Model;
+namespace Client\\$serviceName\\$moduleName\\Model;
 
 use Juling\Foundation\Support\DTOHelper;
 
@@ -260,7 +260,7 @@ EOF;
             $description = isset($property['description']) ? ' // '.$property['description'] : '';
 
             if (isset($schema['required']) && ! in_array($name, $schema['required'])) {
-                $name = $name.'?';
+                // $name = $name.'?';
             }
 
             $c .= "    private $type \$$name;$description\n\n";

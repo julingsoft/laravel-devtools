@@ -38,12 +38,12 @@ class GenTypescript extends Command
             $module = basename($file, '.json');
             $data = json_decode(file_get_contents($file), true);
 
-            $servicePath = $devConfig->getDist(basename(__CLASS__).'/ts/services');
+            $servicePath = $devConfig->getDist('resources/ts/services');
             $this->ensureDirectoryExists($servicePath);
             $serviceContent = $this->genServices($data, $module);
             file_put_contents($servicePath.'/'.$module.'.ts', $serviceContent);
 
-            $typePath = $devConfig->getDist(basename(__CLASS__).'/ts/types');
+            $typePath = $devConfig->getDist('resources/ts/types');
             $this->ensureDirectoryExists($typePath);
             $typeContent = $this->genTypes($data, $module);
             file_put_contents($typePath.'/'.$module.'.d.ts', $typeContent);

@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use Juling\DevTools\Facades\GenerateStub;
 use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
-use Juling\Foundation\Support\StrHelper;
+use Juling\DevTools\Support\StrHelper;
 
 class GenView extends Command
 {
@@ -53,7 +53,7 @@ class GenView extends Command
         $className = Str::ltrim($className, $groupName);
 
         $devConfig = new DevConfig();
-        $dist = $devConfig->getDist(basename(__CLASS__).'/src/views/'.Str::camel($groupName).'/'.Str::camel($className));
+        $dist = $devConfig->getDist('resources/ts/views/'.Str::camel($groupName).'/'.Str::camel($className));
         $this->ensureDirectoryExists($dist);
 
         $viewFile = $dist.'/'.$className.'View.vue';

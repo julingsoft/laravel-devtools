@@ -42,8 +42,7 @@ class GenClient extends Command
     {
         $files = glob(public_path('docs/api/*.json'));
         foreach ($files as $file) {
-            $serviceName = basename(dirname(__DIR__, 6));
-            $serviceName = Str::studly($serviceName);
+            $serviceName = Str::studly(basename(dirname(__DIR__, 6)));
             $moduleName = Str::studly(basename($file, '.json'));
 
             $this->dist = resource_path('client/'.$serviceName.'/'.$moduleName);
@@ -53,7 +52,7 @@ class GenClient extends Command
             $this->genModels($serviceName, $moduleName, $data);
 
             $content = $this->genClient($serviceName, $moduleName, $data);
-            file_put_contents("$this->dist/{$serviceName}{$moduleName}Svc.php", $content);
+            file_put_contents("$this->dist/{$moduleName}Svc.php", $content);
         }
     }
 
@@ -70,7 +69,7 @@ use Exception;
 use OpenApi\\Client\\Support\\SvcClient;
 {{ using }}
 
-class {$serviceName}{$moduleName}Svc
+class {$moduleName}Svc
 {
     use SvcClient;
 \n
@@ -166,9 +165,9 @@ EOF;
                     }
 
                     if ($response === 'mixed') {
-                        $response = "\$result['data']";
+                        $resultData = "\$result['data']";
                     } else {
-                        $response = "new {$response}(\$result['data'])";
+                        $resultData = "new {$response}(\$result['data'])";
                     }
 
                     $apis[] = "    /**
@@ -184,7 +183,7 @@ EOF;
             throw new Exception(\$result['message']);
         }
 
-        return {$response};
+        return {$resultData};
     }\n";
                 }
             }

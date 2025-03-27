@@ -92,12 +92,16 @@ class GenRoute extends Command
             $methodAttributes = $reflectionClass->getMethod($method->name)->getAttributes();
             if (isset($methodAttributes[0])) {
                 $methodAttribute = $methodAttributes[0];
+
+                $httpMethod = Str::lower(Arr::last(explode('\\', $methodAttribute->getName())));
+                $path = $methodAttribute->getArguments()['path'];
+                $summary = $methodAttribute->getArguments()['summary'];
                 $routes[] = [
-                    'httpMethod' => Str::lower(Arr::last(explode('\\', $methodAttribute->getName()))),
-                    'path' => ltrim($methodAttribute->getArguments()['path'], '/'),
+                    'httpMethod' => $httpMethod,
+                    'path' => $path === '/' ? $path : ltrim($path, '/'),
                     'class' => $class,
                     'action' => $method->name,
-                    'summary' => $methodAttribute->getArguments()['summary'],
+                    'summary' => $summary,
                 ];
             }
         }
@@ -112,10 +116,6 @@ class GenRoute extends Command
         foreach ($routes as $route) {
             $routeContent .= "\n    // ".$route['summary'];
             $routeContent .= "\n    Route::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";
-            // if ($route['httpMethod'] === 'get') {
-            //     $name = Str::replace('/', '.', $route['path']);
-            //     $routeContent .= "->name('$name')";
-            // }
             $routeContent .= ';';
         }
         $routeContent .= "\n});";

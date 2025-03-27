@@ -94,12 +94,15 @@ class GenModuleRoute extends Command
                     exit('Route path not found:'.$class.'@'.$method->name);
                 }
 
+                $httpMethod = Str::lower(Arr::last(explode('\\', $methodAttribute->getName())));
+                $path = $methodAttribute->getArguments()['path'];
+                $summary = $methodAttribute->getArguments()['summary'];
                 $routes[] = [
-                    'httpMethod' => Str::lower(Arr::last(explode('\\', $methodAttribute->getName()))),
-                    'path' => ltrim($methodAttribute->getArguments()['path'], '/'),
+                    'httpMethod' => $httpMethod,
+                    'path' => $path === '/' ? $path : ltrim($path, '/'),
                     'class' => $class,
                     'action' => $method->name,
-                    'summary' => $methodAttribute->getArguments()['summary'],
+                    'summary' => $summary,
                 ];
             }
         }
@@ -115,8 +118,11 @@ class GenModuleRoute extends Command
             $routeContent .= "\n    // ".$route['summary'];
             $routeContent .= "\n    Route::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";
             if ($route['httpMethod'] === 'get') {
-                $name = Str::replace('/', '.', $route['path']);
-                // $routeContent .= "->name('$name')";
+                $name = 'index';
+                if ($route['path'] !== '/') {
+                    $name = Str::replace('/', '.', $route['path']);
+                }
+                $routeContent .= "->name('$name')";
             }
             $routeContent .= ';';
         }

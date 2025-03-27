@@ -67,7 +67,7 @@ declare(strict_types=1);
 namespace OpenApi\\Client\\$serviceName\\$moduleName;
 
 use Exception;
-use OpenApi\Client\Support\SvcClient;
+use OpenApi\\Client\\Support\\SvcClient;
 {{ using }}
 
 class {$serviceName}{$moduleName}Svc
@@ -161,6 +161,16 @@ EOF;
                     $svcMethod = Str::camel(Str::replace('/', ' ', $path));
                     $mod = Str::camel($moduleName);
 
+                    if (empty($svcMethod)) {
+                        $svcMethod = 'index';
+                    }
+
+                    if ($response === 'mixed') {
+                        $response = "\$result['data']";
+                    } else {
+                        $response = "new {$response}(\$result['data'])";
+                    }
+
                     $apis[] = "    /**
      * [{$val['tags'][0]}] {$val['summary']}
      *
@@ -174,7 +184,7 @@ EOF;
             throw new Exception(\$result['message']);
         }
 
-        return new {$response}(\$result['data']);
+        return {$response};
     }\n";
                 }
             }

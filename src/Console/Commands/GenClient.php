@@ -260,7 +260,7 @@ EOF;
             $description = isset($property['description']) ? ' // '.$property['description'] : '';
 
             if (isset($schema['required']) && ! in_array($name, $schema['required'])) {
-                // $name = $name.'?';
+                $type = '?'.$type;
             }
 
             $c .= "    private $type \$$name;$description\n\n";

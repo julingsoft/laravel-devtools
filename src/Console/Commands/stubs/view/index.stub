@@ -1,1 +1,5 @@
-index
+import React from 'react'
+
+export default Page = () => {
+    return (<div>index</div>)
+}

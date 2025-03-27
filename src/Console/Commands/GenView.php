@@ -49,25 +49,23 @@ class GenView extends Command
         }
     }
 
-    private function tpl(string $groupName, string $viewName, string $distName, string $comment, array $columns, string $view): void
+    private function tpl(string $groupName, string $viewName, string $name, string $comment, array $columns, string $view): void
     {
-        dump($groupName, $viewName, $distName);
-        $devConfig = new DevConfig();
-        $dist = $devConfig->getDist('resources/ts/views/'.Str::camel($groupName));
+        $dist = resource_path('ts/views/'.Str::camel($groupName));
         if (!empty($viewName)) {
             $dist .= '/'.Str::camel($viewName);
         }
         $this->ensureDirectoryExists($dist);
 
-        $viewFile = $dist.'/'.$distName.'View.vue';
+        $viewFile = $dist.'/'.$name.'.tsx';
         if (! file_exists($viewFile) || $this->option('force')) {
             GenerateStub::from(__DIR__.'/stubs/view/'.$view.'.stub')
                 ->to($dist)
-                ->name($distName.'View')
-                ->ext('vue')
+                ->name($name)
+                ->ext('tsx')
                 ->replaces([
                     'groupName' => $groupName,
-                    'className' => $viewName,
+                    'viewName' => $viewName,
                     'comment' => $comment,
                 ])
                 ->generate();

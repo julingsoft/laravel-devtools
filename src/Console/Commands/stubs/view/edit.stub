@@ -1,1 +1,5 @@
-edit
+import React from 'react'
+
+export default Page = () => {
+    return (<div>edit</div>)
+}

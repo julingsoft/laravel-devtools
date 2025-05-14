@@ -43,15 +43,15 @@ class GenView extends Command
             $comment = StrHelper::rtrim($table['comment'], '表').'模块';
             $columns = $this->getTableColumns($table['name']);
 
-            $this->tpl($groupName, $viewName, $viewName.'Index', $comment, $columns, 'index');
-            $this->tpl($groupName, $viewName, $viewName.'Create', $comment, $columns, 'create');
-            $this->tpl($groupName, $viewName, $viewName.'Edit', $comment, $columns, 'edit');
+            $this->tpl($groupName, $viewName, 'Index', $comment, $columns, 'index');
+            $this->tpl($groupName, $viewName, 'Create', $comment, $columns, 'create');
+            $this->tpl($groupName, $viewName, 'Edit', $comment, $columns, 'edit');
         }
     }
 
     private function tpl(string $groupName, string $viewName, string $name, string $comment, array $columns, string $view): void
     {
-        $dist = resource_path('admin/src/modules/'.Str::camel($groupName));
+        $dist = resource_path('admin/src/views/'.Str::camel($groupName));
         if (!empty($viewName)) {
             $dist .= '/'.Str::camel($viewName);
         }

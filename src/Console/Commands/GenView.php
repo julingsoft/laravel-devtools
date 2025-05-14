@@ -61,7 +61,7 @@ class GenView extends Command
         if (! file_exists($viewFile) || $this->option('force')) {
             GenerateStub::from(__DIR__.'/stubs/view/'.$view.'.stub')
                 ->to($dist)
-                ->name($name)
+                ->name($name.'View')
                 ->ext('vue')
                 ->replaces([
                     'groupName' => $groupName,

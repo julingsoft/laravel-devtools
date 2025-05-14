@@ -1,5 +1,11 @@
-import React from 'react'
+<script setup lang="ts">
 
-export default Page = () => {
-    return (<div>index</div>)
-}
+</script>
+
+<template>
+    <div>index</div>
+</template>
+
+<style scoped>
+
+</style>

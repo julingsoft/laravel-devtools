@@ -38,7 +38,7 @@ class GenView extends Command
         foreach ($tables as $table) {
             $tableName = Str::studly($this->getSingular($table['name']));
             $groupName = $this->getTableGroupName(Str::snake($tableName));
-            $viewName = Str::ltrim($tableName, $groupName);
+            $viewName = Str::substr($tableName, Str::length($groupName));
 
             $comment = StrHelper::rtrim($table['comment'], '表').'模块';
             $columns = $this->getTableColumns($table['name']);
@@ -51,18 +51,18 @@ class GenView extends Command
 
     private function tpl(string $groupName, string $viewName, string $name, string $comment, array $columns, string $view): void
     {
-        $dist = resource_path('ts/views/'.Str::camel($groupName));
+        $dist = resource_path('admin/src/modules/'.Str::camel($groupName));
         if (!empty($viewName)) {
             $dist .= '/'.Str::camel($viewName);
         }
         $this->ensureDirectoryExists($dist);
 
-        $viewFile = $dist.'/'.$name.'.tsx';
+        $viewFile = $dist.'/'.$name.'View.vue';
         if (! file_exists($viewFile) || $this->option('force')) {
             GenerateStub::from(__DIR__.'/stubs/view/'.$view.'.stub')
                 ->to($dist)
                 ->name($name)
-                ->ext('tsx')
+                ->ext('vue')
                 ->replaces([
                     'groupName' => $groupName,
                     'viewName' => $viewName,

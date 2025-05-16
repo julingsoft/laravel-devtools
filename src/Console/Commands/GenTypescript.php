@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
@@ -32,32 +33,32 @@ class GenTypescript extends Command
      */
     public function handle(): void
     {
+        $dist = resource_path('admin/src/services');
+        if ($fs->exists($dist)) {
+            $fs->deleteDirectories($dist);
+        }
+        $dist = resource_path('admin/src/types');
+        if ($fs->exists($dist)) {
+            $fs->deleteDirectories($dist);
+        }
+
         $files = glob(public_path('docs/api/*.json'));
         foreach ($files as $file) {
             $module = basename($file, '.json');
             $data = json_decode(file_get_contents($file), true);
-
-            $servicePath = resource_path('admin/src/services');
-            $this->ensureDirectoryExists($servicePath);
-            $serviceContent = $this->genServices($data, $module);
-            file_put_contents($servicePath.'/'.$module.'.ts', $serviceContent);
-
-            $typePath = resource_path('admin/src/types');
-            $this->ensureDirectoryExists($typePath);
-            $typeContent = $this->genTypes($data, $module);
-            file_put_contents($typePath.'/'.$module.'.d.ts', $typeContent);
+            $this->genServices($data, $module);
         }
     }
 
-    public function genServices(array $data, string $module): string
+    public function genServices(array $data, string $module): void
     {
-        $content = "import request from '@/utils/request'\n";
         if (isset($data['paths'])) {
-            $apis = []; // API接口
-            $types = []; // 参数类型
+            $groupApis = []; // API接口
+            $groupTypes = []; // 参数类型
             foreach ($data['paths'] as $path => $item) {
                 $requestParams = '';
                 $requestBody = '';
+                $group = Arr::first(explode('/', ltrim($path, '/')));
 
                 foreach ($item as $method => $val) {
                     // query 参数
@@ -86,7 +87,7 @@ class GenTypescript extends Command
                         preg_match('/\/components\/schemas\/(\w+)/', $request, $m);
                         if (isset($m[1])) {
                             $interface = 'I'.$m[1];
-                            $types[] = $interface;
+                            $groupTypes[$group][] = $interface;
 
                             if (empty($requestParams)) {
                                 $requestParams .= 'formData: '.$interface;
@@ -104,7 +105,7 @@ class GenTypescript extends Command
                         preg_match('/\/components\/schemas\/(\w+)/', $request, $m);
                         if (isset($m[1])) {
                             $interface = 'I'.$m[1];
-                            $types[] = $interface;
+                            $groupTypes[$group][] = $interface;
 
                             if (empty($requestParams)) {
                                 $requestParams .= 'formData: '.$interface;
@@ -123,7 +124,7 @@ class GenTypescript extends Command
                         preg_match('/\/components\/schemas\/(\w+)/', $response, $m);
                         if (isset($m[1])) {
                             $interface = 'I'.$m[1];
-                            $types[] = $interface;
+                            $groupTypes[$group][] = $interface;
                             $response = '<'.$interface.'>';
                         }
                     }
@@ -131,7 +132,7 @@ class GenTypescript extends Command
                     $service = Str::camel(Str::replace('/', ' ', $path));
                     $url = (Str::substr($path, 0, 1) === '/') ? $module.$path : $module.'/'.$path;
 
-                    $apis[] = "// [{$val['tags'][0]}] {$val['summary']}
+                    $groupApis[$group][] = "// [{$val['tags'][0]}] {$val['summary']}
 export const {$service}Service = ({$requestParams}): Promise{$response} => {
     return request({
         url: '{$url}',
@@ -141,30 +142,46 @@ export const {$service}Service = ({$requestParams}): Promise{$response} => {
                 }
             }
 
-            $content .= 'import type { '.implode(",\n", array_unique($types))." } from '@/types/{$module}.d'\n\n";
+            foreach ($groupApis as $group => $apis) {
+                if (empty($group)) {
+                    continue;
+                }
 
-            $content .= implode("\n", $apis);
+                $servicePath = resource_path('admin/src/services/'.$module);
+                $this->ensureDirectoryExists($servicePath);
+
+                $content = "import request from '@/utils/request'\n";
+                if (isset($groupTypes[$group])) {
+                    $this->genTypes($data, $module, $group, $groupTypes[$group]);
+                    $content .= 'import type { '.implode(",\n", array_unique($groupTypes[$group]))." } from '@/types/{$module}/{$group}'\n\n";
+                }
+                $content .= implode("\n", $apis);
+
+                file_put_contents($servicePath.'/'.$group.'.ts', $content);
+            }
         }
-
-        return $content;
     }
 
-    private function genTypes(array $data, string $module): string
+    private function genTypes(array $data, string $module, string $group, array $types): void
     {
-        $content = '';
+        $contents[$group] = '';
         if (isset($data['components']['schemas'])) {
             foreach ($data['components']['schemas'] as $type => $schema) {
-                if (Str::contains($type, 'Schema')) {
+                if (Str::contains($type, 'Schema') || !in_array('I'.$type, $types)) {
                     continue;
                 }
                 if (! isset($schema['properties'])) {
                     exit($module.' 模块中的 '.$type.' 缺少 properties 参数');
                 }
-                $content .= $this->genTypeSchemas($type, $schema);
+                $contents[$group] .= $this->genTypeSchemas($type, $schema);
             }
         }
 
-        return $content;
+        foreach ($contents as $group => $content) {
+            $typePath = resource_path('admin/src/types/'.$module);
+            $this->ensureDirectoryExists($typePath);
+            file_put_contents($typePath.'/'.$group.'.d.ts', $content);
+        }
     }
 
     private function genTypeSchemas(string $interface, array $schema): string

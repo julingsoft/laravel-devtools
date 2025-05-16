@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
 
 class GenClient extends Command

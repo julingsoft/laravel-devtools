@@ -96,14 +96,14 @@ onActivated(() => {
         header-align="center"
         align="center"
         width="50">
-      </el-table-column>
+      </a-table-column>
 @foreach($columns as $column)
       <a-table-column
         prop="{{ $column['camel_name'] }}"
         header-align="center"
         align="center"
         label="{{ $column['comment'] }}">
-      </el-table-column>
+      </a-table-column>
 @endforeach
       <a-table-column
         fixed="right"
@@ -115,8 +115,8 @@ onActivated(() => {
           <a-button type="text" size="small" @click="upsertHandle(row.{{$primaryKey}})">修改</a-button>
           <a-button type="text" size="small" @click="deleteHandle(row.{{$primaryKey}})">删除</a-button>
         </template>
-      </el-table-column>
-    </el-table>
+      </a-table-column>
+    </a-table>
     <a-pagination
       :current="pageIndex"
       :page-size="pageSize"

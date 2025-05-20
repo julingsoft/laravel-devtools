@@ -63,11 +63,12 @@ class GenView extends Command
         $viewFile = $dist.'/'.$name.'View.vue';
         if (! file_exists($viewFile) || $this->option('force')) {
             $content = file_get_contents(__DIR__ . '/stubs/view/'.$view.'.stub');
+            $primaryKey = $this->getTablePrimaryKey($tableName);
             $render = Blade::render($content, [
                 'camelName' => Str::camel($tableName), // userAccount
                 'snakeName' => Str::snake($tableName), // user_account
                 'studlyName' => Str::studly($tableName), // UserAccount
-                'primaryKey' => $this->getTablePrimaryKey($tableName),
+                'primaryKey' => Str::camel($primaryKey), // actId
                 'comment' => $comment,
                 'columns' => $columns,
             ]);

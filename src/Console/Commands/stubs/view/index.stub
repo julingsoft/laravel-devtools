@@ -53,14 +53,14 @@ export default {
       this.dataListSelections = val
     },
     // 新增 / 修改
-    upsertHandle (id) {
+    upsertHandle (id: number) {
       this.upsertVisible = true
       this.$nextTick(() => {
         this.$refs.upsert.init(id)
       })
     },
     // 删除
-    deleteHandle (id) {
+    deleteHandle (id?: number) {
       var ids = id ? [id] : this.dataListSelections.map(item => {
         return item.{{ $primaryKey }}
       })
@@ -111,7 +111,7 @@ export default {
       </el-table-column>
 @foreach($columns as $column)
       <el-table-column
-        prop="{{ $column['name'] }}"
+        prop="{{ $column['camel_name'] }}"
         header-align="center"
         align="center"
         label="{{ $column['comment'] }}">

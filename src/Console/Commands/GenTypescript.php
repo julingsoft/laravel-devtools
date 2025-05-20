@@ -32,6 +32,8 @@ class GenTypescript extends Command
      */
     public function handle(): void
     {
+        $fs = new Filesystem;
+
         $dist = resource_path('admin/src/services');
         if ($fs->exists($dist)) {
             $fs->deleteDirectories($dist);

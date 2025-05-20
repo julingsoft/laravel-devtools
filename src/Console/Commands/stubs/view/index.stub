@@ -1,145 +1,135 @@
-<script lang="ts">
-import {reactive} from "vue"
+<script setup lang="ts">
+import {reactive, ref, onActivated, nextTick} from "vue"
+import { message, Modal } from 'ant-design-vue';
 import { {{$camelName}}QueryService, {{$camelName}}DestroyService } from '@/services/admin/{{$camelName}}'
-import type { I{{$studlyName}}QueryRequest } from '@/types/admin/{{$camelName}}'
+import type { I{{$studlyName}}QueryRequest, I{{$studlyName}}Response} from '@/types/admin/{{$camelName}}'
+import {isAuth} from '@/utils'
 import Upsert from './UpsertView.vue'
 
-export default {
-  data () {
-    return {
-      dataForm: {
-        key: ''
-      },
-      dataList: [],
-      pageIndex: 1,
-      pageSize: 10,
-      totalPage: 0,
-      dataListLoading: false,
-      dataListSelections: [],
-      upsertVisible: false
-    }
-  },
-  components: {
-    Upsert
-  },
-  activated () {
-    this.getDataList()
-  },
-  methods: {
-    // 获取数据列表
-    getDataList () {
-      this.dataListLoading = true
-      const fromData: I{{$studlyName}}QueryRequest = reactive<I{{$studlyName}}QueryRequest>({})
-      {{$camelName}}QueryService(this.pageIndex, this.pageSize, fromData)
-        .then(({data, total}) => {
-          this.dataList = data
-          this.totalPage = total
-          this.dataListLoading = false
-        })
-    },
-    // 每页数
-    sizeChangeHandle (val: number) {
-      this.pageSize = val
-      this.pageIndex = 1
-      this.getDataList()
-    },
-    // 当前页
-    currentChangeHandle (val: number) {
-      this.pageIndex = val
-      this.getDataList()
-    },
-    // 多选
-    selectionChangeHandle (val) {
-      this.dataListSelections = val
-    },
-    // 新增 / 修改
-    upsertHandle (id: number) {
-      this.upsertVisible = true
-      this.$nextTick(() => {
-        this.$refs.upsert.init(id)
-      })
-    },
-    // 删除
-    deleteHandle (id?: number) {
-      var ids = id ? [id] : this.dataListSelections.map(item => {
-        return item.{{ $primaryKey }}
-      })
-      this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        {{$camelName}}DestroyService(ids).then((data) => {
-          this.$message({
-            message: '操作成功',
-            type: 'success',
-            duration: 1500,
-            onClose: () => {
-              this.getDataList()
-            }
-          })
-        })
-      })
-    }
-  }
+// 响应式数据
+const upsertRef = ref()
+const dataForm = reactive({
+  key: ''
+})
+const dataList = ref<I{{$studlyName}}Response[]>([])
+const pageIndex = ref(1)
+const pageSize = ref(10)
+const totalPage = ref(0)
+const dataListLoading = ref(false)
+const dataListSelections = ref<I{{$studlyName}}Response[]>([])
+const upsertVisible = ref(false)
+
+// 获取数据列表
+const getDataList = () => {
+  dataListLoading.value = true
+  const fromData: I{{$studlyName}}QueryRequest = reactive<I{{$studlyName}}QueryRequest>({})
+  {{$camelName}}QueryService(pageIndex.value, pageSize.value, fromData).then(({data, total}) => {
+      dataList.value = data
+      totalPage.value = total
+      dataListLoading.value = false
+    })
 }
+// 每页数
+  const sizeChangeHandle = (val: number) => {
+  pageSize.value = val
+  pageIndex.value = 1
+  getDataList()
+}
+// 当前页
+const currentChangeHandle = (val: number) => {
+  pageIndex.value = val
+  getDataList()
+}
+// 多选
+const selectionChangeHandle = (val: I{{$studlyName}}Response[]) => {
+  dataListSelections.value = val
+}
+// 新增 / 修改
+const upsertHandle = (id?: number) => {
+  upsertVisible.value = true
+  nextTick(() => {
+    upsertRef.value.init(id)
+  })
+}
+// 删除
+const deleteHandle = (id?: number) => {
+  const ids = id ? [id] : dataListSelections.value.map(item => item.{{$primaryKey}})
+  Modal.confirm({
+    title: '提示',
+    content:  `确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`,
+    okText: '确定',
+    cancelText: '取消',
+    onOk: () => {
+      {{$camelName}}DestroyService(ids).then(() => {
+        message.success('操作成功')
+        getDataList()
+      })
+    }
+  })
+}
+
+onActivated(() => {
+  getDataList()
+})
 </script>
 
 <template>
     <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('${moduleName}:${pathName}:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('${moduleName}:${pathName}:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-      </el-form-item>
-    </el-form>
-    <el-table
+    <a-form :inline="true" :model="dataForm" @keyup.enter="getDataList()">
+      <a-form-item>
+        <a-input v-model="dataForm.key" placeholder="参数名" clearable></a-input>
+      </a-form-item>
+      <a-form-item>
+        <a-button @click="getDataList()">查询</a-button>
+        <a-button v-if="isAuth('${moduleName}:${pathName}:save')" type="primary" @click="upsertHandle()">新增</a-button>
+        <a-button v-if="isAuth('${moduleName}:${pathName}:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</a-button>
+      </a-form-item>
+    </a-form>
+    <a-table
       :data="dataList"
       border
-      v-loading="dataListLoading"
+      :loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
-      <el-table-column
+      <a-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50">
       </el-table-column>
 @foreach($columns as $column)
-      <el-table-column
+      <a-table-column
         prop="{{ $column['camel_name'] }}"
         header-align="center"
         align="center"
         label="{{ $column['comment'] }}">
       </el-table-column>
 @endforeach
-      <el-table-column
+      <a-table-column
         fixed="right"
         header-align="center"
         align="center"
         width="150"
         label="操作">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="upsertHandle(scope.row.{{ $primaryKey }})">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.{{ $primaryKey }})">删除</el-button>
+        <template #default="{ row }">
+          <a-button type="text" size="small" @click="upsertHandle(row.{{$primaryKey}})">修改</a-button>
+          <a-button type="text" size="small" @click="deleteHandle(row.{{$primaryKey}})">删除</a-button>
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      @size-change="sizeChangeHandle"
-      @current-change="currentChangeHandle"
-      :current-page="pageIndex"
-      :page-sizes="[10, 20, 50, 100]"
+    <a-pagination
+      :current="pageIndex"
       :page-size="pageSize"
       :total="totalPage"
-      layout="total, sizes, prev, pager, next, jumper">
-    </el-pagination>
+      :show-size-changer="true"
+      :page-sizes="[10, 20, 50, 100]"
+      show-less-items
+      @size-change="sizeChangeHandle"
+      @change="currentChangeHandle"
+      @showSizeChange="sizeChangeHandle"
+    />
     <!-- 弹窗, 新增 / 修改 -->
-    <upsert v-if="upsertVisible" ref="upsert" @refreshDataList="getDataList"></upsert>
+    <upsert v-if="upsertVisible" ref="upsertRef" @refreshDataList="getDataList"></upsert>
   </div>
 </template>
 

@@ -1,6 +1,9 @@
 <script lang="ts">
-import request from '@/utils/request'
-import Upsert from './${pathName}Upsert'
+import {reactive} from "vue"
+import { {{$camelName}}QueryService, {{$camelName}}DestroyService } from '@/services/admin/{{$camelName}}'
+import type { I{{$studlyName}}QueryRequest } from '@/types/admin/{{$camelName}}'
+import Upsert from './UpsertView.vue'
+
 export default {
   data () {
     return {
@@ -26,33 +29,22 @@ export default {
     // 获取数据列表
     getDataList () {
       this.dataListLoading = true
-      #[[this.$http({]]#
-        #[[url: this.$http.adornUrl]]#('/${moduleName}/${pathName}/list'),
-        method: 'get',
-        #[[params: this.$http.adornParams({]]#
-          'page': this.pageIndex,
-          'limit': this.pageSize,
-          'key': this.dataForm.key
+      const fromData: I{{$studlyName}}QueryRequest = reactive<I{{$studlyName}}QueryRequest>({})
+      {{$camelName}}QueryService(this.pageIndex, this.pageSize, fromData)
+        .then(({data, total}) => {
+          this.dataList = data
+          this.totalPage = total
+          this.dataListLoading = false
         })
-      }).then(({data}) => {
-        if (data && data.code === 0) {
-          this.dataList = data.page.list
-          this.totalPage = data.page.totalCount
-        } else {
-          this.dataList = []
-          this.totalPage = 0
-        }
-        this.dataListLoading = false
-      })
     },
     // 每页数
-    sizeChangeHandle (val) {
+    sizeChangeHandle (val: number) {
       this.pageSize = val
       this.pageIndex = 1
       this.getDataList()
     },
     // 当前页
-    currentChangeHandle (val) {
+    currentChangeHandle (val: number) {
       this.pageIndex = val
       this.getDataList()
     },
@@ -63,37 +55,29 @@ export default {
     // 新增 / 修改
     upsertHandle (id) {
       this.upsertVisible = true
-      #[[this.$nextTick(() => {]]#
+      this.$nextTick(() => {
         this.$refs.upsert.init(id)
       })
     },
     // 删除
     deleteHandle (id) {
       var ids = id ? [id] : this.dataListSelections.map(item => {
-        return item.${pk.attrname}
+        return item.{{ $primaryKey }}
       })
-      #[[this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {]]#
+      this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        #[[this.$http({]]#
-          url: #[[this.$http.adornUrl]]#('/${moduleName}/${pathName}/delete'),
-          method: 'post',
-          data: this.$http.adornData(ids, false)
-        }).then(({data}) => {
-          if (data && data.code === 0) {
-            #[[this.$message({]]#
-              message: '操作成功',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.getDataList()
-              }
-            })
-          } else {
-            #[[this.$message.error(data.msg)]]#
-          }
+        {{$camelName}}DestroyService(ids).then((data) => {
+          this.$message({
+            message: '操作成功',
+            type: 'success',
+            duration: 1500,
+            onClose: () => {
+              this.getDataList()
+            }
+          })
         })
       })
     }
@@ -125,14 +109,14 @@ export default {
         align="center"
         width="50">
       </el-table-column>
-#foreach($column in $columns)
+@foreach($columns as $column)
       <el-table-column
-        prop="${column.attrname}"
+        prop="{{ $column['name'] }}"
         header-align="center"
         align="center"
-        label="${column.comments}">
+        label="{{ $column['comment'] }}">
       </el-table-column>
-#end
+@endforeach
       <el-table-column
         fixed="right"
         header-align="center"
@@ -140,8 +124,8 @@ export default {
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="upsertHandle(scope.row.${pk.attrname})">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.${pk.attrname})">删除</el-button>
+          <el-button type="text" size="small" @click="upsertHandle(scope.row.{{ $primaryKey }})">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.{{ $primaryKey }})">删除</el-button>
         </template>
       </el-table-column>
     </el-table>

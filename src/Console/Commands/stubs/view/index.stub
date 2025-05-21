@@ -30,7 +30,7 @@ const getDataList = () => {
     })
 }
 // 每页数
-  const sizeChangeHandle = (val: number) => {
+const sizeChangeHandle = (val: number) => {
   pageSize.value = val
   pageIndex.value = 1
   getDataList()

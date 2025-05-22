@@ -101,8 +101,8 @@ class GenTypescript extends Command
                         }
                     } else if (isset($val['requestBody']['content']['application/json']['schema']['items']['type'])) {
                         $request = $val['requestBody']['content']['application/json']['schema']['items']['type'];
-                        $requestParams = 'ids: []number';
-                        $requestBody = ",\n        params: {ids}";
+                        $requestParams = 'id: []number';
+                        $requestBody = ",\n        params: {id}";
                     }
 
                     // 文件上传

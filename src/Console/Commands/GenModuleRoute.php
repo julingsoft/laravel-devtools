@@ -112,7 +112,7 @@ class GenModuleRoute extends Command
     private function getRouteContent(string $module, array $routes): string
     {
         $routeContent = '// '.$module.' route start';
-        $routeContent .= "\nRoute::prefix('{$module}')->group(function () {";
+        $routeContent .= "\nRoute::prefix('/')->group(function () {";
         foreach ($routes as $route) {
             $routeContent .= "\n    // ".$route['summary'];
             $routeContent .= "\n    Route::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";
@@ -121,7 +121,6 @@ class GenModuleRoute extends Command
                 if ($route['path'] !== '/') {
                     $name = Str::replace('/', '.', $route['path']);
                 }
-                $routeContent .= "->name('$name')";
             }
             $routeContent .= ';';
         }

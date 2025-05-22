@@ -101,7 +101,7 @@ class GenTypescript extends Command
                         }
                     } else if (isset($val['requestBody']['content']['application/json']['schema']['items']['type'])) {
                         $request = $val['requestBody']['content']['application/json']['schema']['items']['type'];
-                        $requestParams = 'id: []number';
+                        $requestParams = 'id: number[]';
                         $requestBody = ",\n        params: {id}";
                     }
 
@@ -139,7 +139,7 @@ class GenTypescript extends Command
                         if (isset($m[1])) {
                             $interface = 'I'.$m[1];
                             $groupTypes[$group][] = $interface;
-                            $response = '<[]'.$interface.'>';
+                            $response = '<'.$interface.'[]>';
                         }
                     }
 

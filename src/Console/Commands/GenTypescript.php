@@ -99,6 +99,10 @@ class GenTypescript extends Command
 
                             $requestBody .= ",\n        data: formData";
                         }
+                    } else if (isset($val['requestBody']['content']['application/json']['schema']['items']['type'])) {
+                        $request = $val['requestBody']['content']['application/json']['schema']['items']['type'];
+                        $requestParams = 'ids: []number';
+                        $requestBody = ",\n        params: {ids}";
                     }
 
                     // 文件上传
@@ -128,6 +132,14 @@ class GenTypescript extends Command
                             $interface = 'I'.$m[1];
                             $groupTypes[$group][] = $interface;
                             $response = '<'.$interface.'>';
+                        }
+                    } else if (isset($val['responses'][200]['content']['application/json']['schema']['items']['$ref'])) {
+                        $response = $val['responses'][200]['content']['application/json']['schema']['items']['$ref'];
+                        preg_match('/\/components\/schemas\/(\w+)/', $response, $m);
+                        if (isset($m[1])) {
+                            $interface = 'I'.$m[1];
+                            $groupTypes[$group][] = $interface;
+                            $response = '<[]'.$interface.'>';
                         }
                     }
 

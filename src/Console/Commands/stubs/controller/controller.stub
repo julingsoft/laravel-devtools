@@ -162,7 +162,7 @@ class {{ className }}Controller extends Controller
     }
 
     #[OA\Delete(path: '/{{ classCamelName }}/destroy', summary: '删除{{ comment }}接口', security: [['bearerAuth' => []]], tags: ['{{ comment }}模块'])]
-    #[OA\Parameter(name: 'id', description: 'ID', in: 'query', required: true, example: 1)]
+    #[OA\RequestBody(required: true, content: new OA\JsonContent(type: 'array', items: new OA\Items(type: 'integer')))]
     #[OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(ref: {{ className }}DestroyResponse::class))]
     public function destroy(Request $request): JsonResponse
     {

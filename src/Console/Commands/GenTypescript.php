@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Juling\DevTools\Support\SchemaTrait;

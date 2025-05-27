@@ -43,4 +43,9 @@ class DevConfig
     {
         return $this->config['multi_module'];
     }
+
+    public function getMultiLanguage(): array
+    {
+        return $this->config['multi_language'];
+    }
 }

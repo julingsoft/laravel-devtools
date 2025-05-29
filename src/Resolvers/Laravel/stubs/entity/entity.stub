@@ -9,6 +9,6 @@ use OpenApi\Attributes as OA;
 class {{ $className }}Entity
 {
     use DTOHelper;
-{{ $fields }}
-{{ $methods }}
+{!! $fields !!}
+{!! $methods !!}
 }

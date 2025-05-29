@@ -61,13 +61,13 @@ class EntityBuilder implements EntityContract
         $fields = rtrim($fields, "\n");
         $methods = rtrim($methods, "\n");
 
-        $tpl = file_get_contents(__DIR__ . '/stubs/entity/php_entity.stub');
-        $content = Blade::render($tpl, [
+        $content = Blade::render(file_get_contents(__DIR__ . '/stubs/entity/php_entity.stub'), [
             'namespace' => $namespace,
             'entity' => $className,
             'fields' => $fields,
             'methods' => $methods,
-        ], deleteCachedView: true);
+        ]);
+
         file_put_contents($dist . '/' . $className . 'Entity.php', "<?php\n\n".$content);
     }
 }

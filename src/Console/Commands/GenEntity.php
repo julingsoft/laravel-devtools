@@ -36,11 +36,11 @@ class GenEntity extends Command
         foreach ($tables as $table) {
             $tableName = $table['name'];
             $comment = StrHelper::rtrim($table['comment'], '表');
-            $this->entityManager($tableName, $comment);
+            $this->build($tableName, $comment);
         }
     }
 
-    private function entityManager(string $tableName, string $comment): void
+    private function build(string $tableName, string $comment): void
     {
         $devConfig = new DevConfig();
         $languages = $devConfig->getMultiLanguage();

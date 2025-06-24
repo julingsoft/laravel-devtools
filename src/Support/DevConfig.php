@@ -24,9 +24,29 @@ class DevConfig
         return $dist;
     }
 
+    public function getMultiModule(): bool
+    {
+        return $this->config['multi_module'];
+    }
+
     public function getIgnoreTables(): array
     {
         return $this->config['ignore_tables'];
+    }
+
+    public function getIgnoreColumns(string $tableName = ''): array
+    {
+        $ignoreColumns = $this->config['ignore_columns'];
+
+        $columns = array_filter($ignoreColumns, function ($v, $k) {
+            return is_int($k);
+        }, ARRAY_FILTER_USE_BOTH);
+
+        if (! empty($tableName) && isset($ignoreColumns[$tableName])) {
+            $columns = array_merge($columns, $ignoreColumns[$tableName]);
+        }
+
+        return $columns;
     }
 
     public function getIgnoreControllers(): array
@@ -37,15 +57,5 @@ class DevConfig
     public function getIgnoreSingular(): bool
     {
         return $this->config['ignore_singular'];
-    }
-
-    public function getMultiModule(): bool
-    {
-        return $this->config['multi_module'];
-    }
-
-    public function getMultiLanguage(): array
-    {
-        return $this->config['multi_language'];
     }
 }

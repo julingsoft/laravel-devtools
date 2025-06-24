@@ -11,17 +11,7 @@ use Illuminate\Support\Str;
 
 trait SchemaTrait
 {
-    private array $ignoreTables = [
-        'cache',
-        'cache_locks',
-        'failed_jobs',
-        'jobs',
-        'job_batches',
-        'migrations',
-        'password_reset_tokens',
-        'personal_access_tokens',
-        'sessions',
-    ];
+    private array $ignoreTables = [];
 
     private bool $ignoreSingular = true;
 
@@ -36,14 +26,14 @@ trait SchemaTrait
             }
 
             // 匹配表前缀
-            if (! empty($tablePrefix)) {
-                if (! Str::startsWith($table['name'], $tablePrefix)) {
+            if (!empty($tablePrefix)) {
+                if (!Str::startsWith($table['name'], $tablePrefix)) {
                     unset($tables[$key]);
                 }
             }
 
             // 匹配表名称
-            if (! empty($tableName)) {
+            if (!empty($tableName)) {
                 if ($table['name'] !== $tableName) {
                     unset($tables[$key]);
                 }
@@ -53,26 +43,63 @@ trait SchemaTrait
         return $tables;
     }
 
-    private function getTableColumns($tableName): array
+    private function getTableIndexes(string $tableName): array
+    {
+        $indexes = Schema::getIndexes($tableName);
+
+        $columns = [];
+        foreach ($indexes as $key => $item) {
+            foreach ($item['columns'] as $column) {
+                $columns[$key] = [
+                    'name' => $column,
+                    'camel_name' => Str::camel($column),
+                    'studly_name' => Str::studly($column),
+                    'unique' => $item['unique'],
+                    'primary' => $item['primary'],
+                ];
+            }
+        }
+
+        return $columns;
+    }
+
+    private function getTableColumns(string $tableName, ?callable $callback = null): array
     {
         $columns = Schema::getColumns($tableName);
         $indexes = Schema::getIndexes($tableName);
         $indexes = Arr::pluck($indexes, 'columns');
         $indexes = Arr::collapse($indexes);
 
-        foreach ($columns as $key => $row) {
-            $row['index'] = in_array($row['name'], $indexes);
-            $row['camel_name'] = Str::camel($row['name']);
-            $row['studly_name'] = Str::studly($row['name']);
-            $row['base_type'] = $this->getFieldType($row['type_name']);
-            $row['swagger_type'] = $row['base_type'] === 'int' ? 'integer' : $row['base_type'];
-            $columns[$key] = $row;
+        foreach ($columns as $key => $column) {
+            $comment = Str::replace([':', '：', ' ', '(', '（'], ':', $column['comment']);
+            $comments = explode(':', $comment);
+            $column['comment_short'] = Arr::first($comments);
+            if (empty($column['comment'])) {
+                if ($column['name'] === 'id') {
+                    $column['comment'] = 'ID';
+                } else if ($column['name'] === 'created_at') {
+                    $column['comment'] = '创建时间';
+                } else if ($column['name'] === 'updated_at') {
+                    $column['comment'] = '更新时间';
+                } else if ($column['name'] === 'deleted_at') {
+                    $column['comment'] = '删除时间';
+                } else {
+                    $column['comment'] = '';
+                }
+            }
+
+            $column['index'] = in_array($column['name'], $indexes);
+            $column['camel_name'] = Str::camel($column['name']);
+            $column['studly_name'] = Str::studly($column['name']);
+            $column['base_type'] = $callback($column['type_name']);
+            $column['swagger_type'] = $column['base_type'] === 'int' ? 'integer' : $column['base_type'];
+            $columns[$key] = $column;
         }
 
         return $columns;
     }
 
-    private function getTablePrimaryKey($tableName): string
+    private function getTablePrimaryKey(string $tableName): string
     {
         $columns = Schema::getIndexes($tableName);
 
@@ -94,6 +121,29 @@ trait SchemaTrait
         return Str::studly($this->getSingular($groups[0]));
     }
 
+    private function resolve(string $genType, array $table = []): void
+    {
+        $namespace = str_replace('\\', '/', __NAMESPACE__);
+        $namespace = str_replace('/', '\\', dirname($namespace));
+
+        if (!empty($table)) {
+            $singular = $this->getSingular($table['name']);
+            $table = [
+                'tableName' => $table['name'],
+                'className' => Str::studly($singular),
+                'camelName' => Str::camel($singular),
+                'snakeName' => Str::snake($singular),
+                'tableComment' => StrHelper::rtrim($table['comment'], '表'),
+            ];
+        }
+
+        $resolver = '\\' . $namespace . '\\Resolvers\\' . Str::studly($genType) . 'Resolver';
+        if (method_exists($resolver, 'build')) {
+            $devConfig = new DevConfig();
+            (new $resolver)->build($devConfig, $table);
+        }
+    }
+
     private function getSingular(string $name): string
     {
         $this->ignoreSingular = config('devtools.ignore_singular', $this->ignoreSingular);
@@ -103,53 +153,6 @@ trait SchemaTrait
         }
 
         return Str::singular($name);
-    }
-
-    private function getFieldType($type): string
-    {
-        preg_match('/(\w+)\(/', $type, $m);
-        $type = $m[1] ?? $type;
-        $type = str_replace(' unsigned', '', $type);
-        if (in_array($type, ['bit', 'int', 'bigint', 'mediumint', 'smallint', 'tinyint', 'enum'])) {
-            $type = 'int';
-        }
-        if (in_array($type, ['varchar', 'char', 'text', 'mediumtext', 'longtext'])) {
-            $type = 'string';
-        }
-        if (in_array($type, ['decimal', 'float', 'double'])) {
-            $type = 'float';
-        }
-        if (in_array($type, ['date', 'datetime', 'timestamp', 'time'])) {
-            $type = 'string';
-        }
-        if (! in_array($type, ['int', 'string', 'float'])) {
-            $type = 'string';
-        }
-
-        return $type;
-    }
-
-    private function getSet($field, $type, $comment): string
-    {
-        $capitalName = Str::studly($field);
-
-        return <<<EOF
-    /**
-     * 获取{$comment}
-     */
-    public function get{$capitalName}(): $type
-    {
-        return \$this->$field;
-    }
-
-    /**
-     * 设置{$comment}
-     */
-    public function set{$capitalName}($type \${$field}): void
-    {
-        \$this->$field = \${$field};
-    }
-EOF;
     }
 
     private function ensureDirectoryExists(array|string $dirs): void
@@ -169,6 +172,8 @@ EOF;
     {
         $fs = new Filesystem;
 
-        $fs->deleteDirectories($directory);
+        if ($fs->isDirectory($directory)) {
+            $fs->deleteDirectory($directory);
+        }
     }
 }

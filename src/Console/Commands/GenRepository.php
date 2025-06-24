@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
-use Juling\DevTools\Facades\GenerateStub;
-use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
+use Juling\DevTools\Support\StrHelper;
 
 class GenRepository extends Command
 {
@@ -35,35 +33,7 @@ class GenRepository extends Command
     {
         $tables = $this->getTables($this->option('prefix'), $this->option('table'));
         foreach ($tables as $table) {
-            $tableName = $table['name'];
-            $className = Str::studly($this->getSingular($tableName));
-
-            $this->repositoryTpl($className, $tableName);
+            $this->resolve('repository', $table);
         }
-    }
-
-    private function repositoryTpl(string $className, string $tableName): void
-    {
-        $devConfig = new DevConfig();
-        if ($devConfig->getMultiModule()) {
-            $groupName = $this->getTableGroupName($tableName);
-            $dist = $devConfig->getDist('app/Modules/'.$groupName.'/Repositories');
-            $namespace = "App\\Modules\\$groupName";
-        } else {
-            $dist = $devConfig->getDist('app/Repositories');
-            $namespace = 'App';
-        }
-        $this->ensureDirectoryExists($dist);
-
-        GenerateStub::from(__DIR__.'/stubs/repository/repository.stub')
-            ->to($dist)
-            ->name($className.'Repository')
-            ->ext('php')
-            ->replaces([
-                'namespace' => $namespace,
-                'className' => $className,
-                'tableName' => $tableName,
-            ])
-            ->generate();
     }
 }

@@ -7,7 +7,7 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Juling\DevTools\Support\SchemaTrait;
 
-class GenClient extends Command
+class GenBundleRoute extends Command
 {
     use SchemaTrait;
 
@@ -16,27 +16,20 @@ class GenClient extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:client';
+    protected $signature = 'gen:bundle:route';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Generate service client';
-
-    /**
-     * 输出文件的目录
-     *
-     * @var string
-     */
-    private string $dist;
+    protected $description = 'Generate project module routes';
 
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        $this->resolve('client');
+        $this->resolve('bundleRoute');
     }
 }

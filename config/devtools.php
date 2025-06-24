@@ -2,16 +2,28 @@
 
 return [
     'dist' => storage_path('code'),
-    'ignore_tables' => [],
-    'ignore_controllers' => [],
-    'ignore_singular' => true,
-    'multi_module' => false,
-    'multi_language' => [
-        'Gin' => [],
-        'Laravel' => [],
-        'ThinkPHP' => [],
-        'Spring' => [
-            'package_name' => 'com.xxx.xxx',
-        ],
+    'multi_module' => true,
+    'ignore_tables' => [
+        'cache',
+        'cache_locks',
+        'failed_jobs',
+        'jobs',
+        'job_batches',
+        'migrations',
+        'password_reset_tokens',
+        'personal_access_tokens',
+        'sessions',
     ],
+    'ignore_columns' => [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'user' => [
+            'xxxx',
+        ]
+    ],
+    'ignore_controllers' => [
+        'base',
+    ],
+    'ignore_singular' => true,
 ];

@@ -12,6 +12,7 @@ use Juling\DevTools\Console\Commands\GenDict;
 use Juling\DevTools\Console\Commands\GenEntity;
 use Juling\DevTools\Console\Commands\GenEnums;
 use Juling\DevTools\Console\Commands\GenModel;
+use Juling\DevTools\Console\Commands\GenPagesRoute;
 use Juling\DevTools\Console\Commands\GenRepository;
 use Juling\DevTools\Console\Commands\GenRoute;
 use Juling\DevTools\Console\Commands\GenService;
@@ -47,6 +48,7 @@ class DevToolsServiceProvider extends ServiceProvider
                 GenEntity::class,
                 GenEnums::class,
                 GenModel::class,
+                GenPagesRoute::class,
                 GenRepository::class,
                 GenRoute::class,
                 GenService::class,

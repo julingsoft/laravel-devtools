@@ -7,7 +7,7 @@ namespace Juling\DevTools\Console\Commands;
 use Illuminate\Console\Command;
 use Juling\DevTools\Support\SchemaTrait;
 
-class GenBundleRoute extends Command
+class GenModuleRoute extends Command
 {
     use SchemaTrait;
 
@@ -16,7 +16,7 @@ class GenBundleRoute extends Command
      *
      * @var string
      */
-    protected $signature = 'gen:bundle:route';
+    protected $signature = 'gen:module:route';
 
     /**
      * The console command description.
@@ -30,6 +30,6 @@ class GenBundleRoute extends Command
      */
     public function handle(): void
     {
-        $this->resolve('bundleRoute');
+        $this->resolve('moduleRoute');
     }
 }

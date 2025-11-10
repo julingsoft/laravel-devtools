@@ -37,7 +37,7 @@ class ControllerResolver extends Foundation
             $dist = $devConfig->getDist('app/Bundles/' . $groupName . '/Http/Controllers');
             $baseNamespace = "App\\Bundles\\$groupName";
             $namespace = $baseNamespace . '\\Http';
-            $entityNamespace = "App\\Modules\\$groupName";
+            $entityNamespace = "App\\Bundles\\$groupName";
         } else {
             $dist = $devConfig->getDist('app/Api/' . $outDir . '/Controllers');
             $baseNamespace = 'App';

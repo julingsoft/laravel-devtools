@@ -12,7 +12,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 
-class BundleRouteResolver extends Foundation
+class ModuleRouteResolver extends Foundation
 {
     use SchemaTrait;
 
@@ -21,11 +21,11 @@ class BundleRouteResolver extends Foundation
      */
     public function build(DevConfig $devConfig, array $data): void
     {
-        $modules = glob(app_path('Bundles/*'), GLOB_ONLYDIR);
+        $modules = glob(app_path('Modules/*'), GLOB_ONLYDIR);
         foreach ($modules as $modulePath) {
             $module = basename($modulePath);
 
-            $dist = app_path('Bundles/'.$module.'/Routes');
+            $dist = app_path('Modules/'.$module.'/Routes');
             $this->ensureDirectoryExists($dist);
 
             $controllers = glob($modulePath.'/Http/Controllers/*Controller.php');

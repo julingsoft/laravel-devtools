@@ -21,6 +21,7 @@ class DevConfig
         if (! empty($moduleName)) {
             $dist .= '/'.$moduleName;
         }
+
         return $dist;
     }
 

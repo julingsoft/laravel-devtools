@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Juling\DevTools\Resolvers\Foundation;
+namespace Juling\DevTools\Resolvers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Juling\DevTools\Resolvers\Foundation;
 use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
 
@@ -26,6 +25,7 @@ class TypescriptResolver extends Foundation
             $this->genServices($data, $module);
         }
     }
+
     public function genServices(array $data, string $module): void
     {
         if (isset($data['paths'])) {
@@ -73,7 +73,7 @@ class TypescriptResolver extends Foundation
 
                             $requestBody .= ",\n        data: formData";
                         }
-                    } else if (isset($val['requestBody']['content']['application/json']['schema']['items']['type'])) {
+                    } elseif (isset($val['requestBody']['content']['application/json']['schema']['items']['type'])) {
                         $request = $val['requestBody']['content']['application/json']['schema']['items']['type'];
                         $requestParams = 'id: number[]';
                         $requestBody = ",\n        params: {id}";
@@ -107,7 +107,7 @@ class TypescriptResolver extends Foundation
                             $groupTypes[$group][] = $interface;
                             $response = '<'.$interface.'>';
                         }
-                    } else if (isset($val['responses'][200]['content']['application/json']['schema']['items']['$ref'])) {
+                    } elseif (isset($val['responses'][200]['content']['application/json']['schema']['items']['$ref'])) {
                         $response = $val['responses'][200]['content']['application/json']['schema']['items']['$ref'];
                         preg_match('/\/components\/schemas\/(\w+)/', $response, $m);
                         if (isset($m[1])) {
@@ -155,7 +155,7 @@ export const {$service}Service = ({$requestParams}): Promise{$response} => {
         $contents[$group] = '';
         if (isset($data['components']['schemas'])) {
             foreach ($data['components']['schemas'] as $type => $schema) {
-                if (Str::contains($type, 'Schema') || !in_array('I'.$type, $types)) {
+                if (Str::contains($type, 'Schema') || ! in_array('I'.$type, $types)) {
                     continue;
                 }
                 if (! isset($schema['properties'])) {

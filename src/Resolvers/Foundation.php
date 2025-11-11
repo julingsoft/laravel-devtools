@@ -23,7 +23,7 @@ abstract class Foundation
         if (in_array($type, ['date', 'datetime', 'timestamp', 'time'])) {
             $type = 'string';
         }
-        if (!in_array($type, ['int', 'string', 'float'])) {
+        if (! in_array($type, ['int', 'string', 'float'])) {
             $type = 'string';
         }
 

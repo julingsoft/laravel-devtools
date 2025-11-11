@@ -17,7 +17,7 @@ class ControllerResolver extends Foundation
 
     public function build(DevConfig $devConfig, array $data): void
     {
-        $columns = $this->getTableColumns($data['tableName'], fn($fieldType) => $this->getFieldType($fieldType));
+        $columns = $this->getTableColumns($data['tableName'], fn ($fieldType) => $this->getFieldType($fieldType));
         $indexes = $this->getTableIndexes($data['tableName']);
 
         $this->controllerTpl($data['className'], $indexes, $data['tableComment'], 'Admin');
@@ -32,22 +32,22 @@ class ControllerResolver extends Foundation
     {
         $groupName = $this->getTableGroupName(Str::snake($className));
 
-        $devConfig = new DevConfig();
+        $devConfig = new DevConfig;
         if ($devConfig->getMultiModule()) {
-            $dist = $devConfig->getDist('app/Bundles/' . $groupName . '/Http/Controllers');
+            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Http/Controllers');
             $baseNamespace = "App\\Bundles\\$groupName";
-            $namespace = $baseNamespace . '\\Http';
+            $namespace = $baseNamespace.'\\Http';
             $entityNamespace = "App\\Bundles\\$groupName";
         } else {
-            $dist = $devConfig->getDist('app/Api/' . $outDir . '/Controllers');
+            $dist = $devConfig->getDist('app/Api/'.$outDir.'/Controllers');
             $baseNamespace = 'App';
-            $namespace = $baseNamespace . '\\Api\\' . $outDir;
-            $entityNamespace = "App";
+            $namespace = $baseNamespace.'\\Api\\'.$outDir;
+            $entityNamespace = 'App';
         }
 
         $this->ensureDirectoryExists($dist);
 
-        $content = Blade::render(file_get_contents(__DIR__ . '/stubs/controller/controller.stub'), [
+        $content = Blade::render(file_get_contents(__DIR__.'/stubs/controller/controller.stub'), [
             'namespace' => $namespace,
             'baseNamespace' => $baseNamespace,
             'entityNamespace' => $entityNamespace,
@@ -58,7 +58,7 @@ class ControllerResolver extends Foundation
             'comment' => $comment,
         ], deleteCachedView: true);
 
-        file_put_contents($dist . '/' . $className . 'Controller.php', "<?php\n\n" . $content);
+        file_put_contents($dist.'/'.$className.'Controller.php', "<?php\n\n".$content);
     }
 
     private function queryRequestTpl(string $className, array $columns, array $indexes, string $outDir): void
@@ -75,7 +75,7 @@ class ControllerResolver extends Foundation
 
         $this->writeRequest($className, 'QueryRequest', [
             'className' => $className,
-            'schema' => $className . 'QueryRequest',
+            'schema' => $className.'QueryRequest',
             'tableColumns' => $columns,
             'tableIndexes' => $indexes,
         ], $outDir);
@@ -91,7 +91,7 @@ class ControllerResolver extends Foundation
 
         $this->writeRequest($className, 'CreateRequest', [
             'className' => $className,
-            'schema' => $className . 'CreateRequest',
+            'schema' => $className.'CreateRequest',
             'tableColumns' => $columns,
             'tableIndexes' => $indexes,
         ], $outDir);
@@ -108,7 +108,7 @@ class ControllerResolver extends Foundation
 
         $this->writeRequest($className, 'UpdateRequest', [
             'className' => $className,
-            'schema' => $className . 'UpdateRequest',
+            'schema' => $className.'UpdateRequest',
             'tableColumns' => $columns,
             'tableIndexes' => $indexes,
         ], $outDir);
@@ -118,7 +118,7 @@ class ControllerResolver extends Foundation
     {
         $this->writeRequest($className, 'DestroyRequest', [
             'className' => $className,
-            'schema' => $className . 'DestroyRequest',
+            'schema' => $className.'DestroyRequest',
             'tableColumns' => $columns,
             'tableIndexes' => $indexes,
         ], $outDir);
@@ -126,14 +126,14 @@ class ControllerResolver extends Foundation
 
     private function writeRequest(string $className, string $suffix, array $data, string $outDir): void
     {
-        $devConfig = new DevConfig();
+        $devConfig = new DevConfig;
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName(Str::snake($className));
-            $dist = $devConfig->getDist('app/Bundles/' . $groupName . '/Http/Requests/' . $className);
+            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Http/Requests/'.$className);
             $namespace = "App\\Bundles\\$groupName\\Http";
         } else {
-            $dist = $devConfig->getDist('app/Api/' . $outDir . '/Requests/' . $className);
-            $namespace = 'App\\Api\\' . $outDir;
+            $dist = $devConfig->getDist('app/Api/'.$outDir.'/Requests/'.$className);
+            $namespace = 'App\\Api\\'.$outDir;
         }
         $this->ensureDirectoryExists($dist);
 
@@ -141,34 +141,34 @@ class ControllerResolver extends Foundation
             'namespace' => $namespace,
         ], $data);
 
-        $content = Blade::render(file_get_contents(__DIR__ . '/stubs/request/'.Str::snake($suffix).'.stub'), $data, deleteCachedView: true);
-        file_put_contents($dist . '/' . $className . $suffix . '.php', "<?php\n\n" . $content);
+        $content = Blade::render(file_get_contents(__DIR__.'/stubs/request/'.Str::snake($suffix).'.stub'), $data, deleteCachedView: true);
+        file_put_contents($dist.'/'.$className.$suffix.'.php', "<?php\n\n".$content);
     }
 
     private function responseTpl(string $className, array $columns, array $indexes, string $outDir): void
     {
-        $devConfig = new DevConfig();
+        $devConfig = new DevConfig;
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName(Str::snake($className));
-            $dist = $devConfig->getDist('app/Bundles/' . $groupName . '/Http/Responses/' . $className);
+            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Http/Responses/'.$className);
             $namespace = "App\\Bundles\\$groupName\\Http";
         } else {
-            $dist = $devConfig->getDist('app/Api/' . $outDir . '/Responses/' . $className);
-            $namespace = 'App\\Api\\' . $outDir;
+            $dist = $devConfig->getDist('app/Api/'.$outDir.'/Responses/'.$className);
+            $namespace = 'App\\Api\\'.$outDir;
         }
         $this->ensureDirectoryExists($dist);
 
-        $content = Blade::render(file_get_contents(__DIR__ . '/stubs/response/query.stub'), [
+        $content = Blade::render(file_get_contents(__DIR__.'/stubs/response/query.stub'), [
             'namespace' => $namespace,
             'className' => $className,
         ], deleteCachedView: true);
-        file_put_contents($dist . '/' . $className . 'QueryResponse.php', "<?php\n\n" . $content);
+        file_put_contents($dist.'/'.$className.'QueryResponse.php', "<?php\n\n".$content);
 
-        $content = Blade::render(file_get_contents(__DIR__ . '/stubs/response/destroy.stub'), [
+        $content = Blade::render(file_get_contents(__DIR__.'/stubs/response/destroy.stub'), [
             'namespace' => $namespace,
             'className' => $className,
         ], deleteCachedView: true);
-        file_put_contents($dist . '/' . $className . 'DestroyResponse.php', "<?php\n\n" . $content);
+        file_put_contents($dist.'/'.$className.'DestroyResponse.php', "<?php\n\n".$content);
 
         $ignoreFields = ['deleted_time', 'password', 'password_salt'];
         foreach ($columns as $key => $column) {
@@ -177,11 +177,11 @@ class ControllerResolver extends Foundation
             }
         }
 
-        $content = Blade::render(file_get_contents(__DIR__ . '/stubs/response/response.stub'), [
+        $content = Blade::render(file_get_contents(__DIR__.'/stubs/response/response.stub'), [
             'namespace' => $namespace,
             'className' => $className,
             'tableColumns' => $columns,
         ], deleteCachedView: true);
-        file_put_contents($dist . '/' . $className . 'Response.php', "<?php\n\n" . $content);
+        file_put_contents($dist.'/'.$className.'Response.php', "<?php\n\n".$content);
     }
 }

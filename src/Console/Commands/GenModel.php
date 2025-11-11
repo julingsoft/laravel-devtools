@@ -6,7 +6,6 @@ namespace Juling\DevTools\Console\Commands;
 
 use Illuminate\Console\Command;
 use Juling\DevTools\Support\SchemaTrait;
-use Juling\DevTools\Support\StrHelper;
 
 class GenModel extends Command
 {

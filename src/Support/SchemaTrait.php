@@ -26,14 +26,14 @@ trait SchemaTrait
             }
 
             // 匹配表前缀
-            if (!empty($tablePrefix)) {
-                if (!Str::startsWith($table['name'], $tablePrefix)) {
+            if (! empty($tablePrefix)) {
+                if (! Str::startsWith($table['name'], $tablePrefix)) {
                     unset($tables[$key]);
                 }
             }
 
             // 匹配表名称
-            if (!empty($tableName)) {
+            if (! empty($tableName)) {
                 if ($table['name'] !== $tableName) {
                     unset($tables[$key]);
                 }
@@ -77,11 +77,11 @@ trait SchemaTrait
             if (empty($column['comment'])) {
                 if ($column['name'] === 'id') {
                     $column['comment'] = 'ID';
-                } else if ($column['name'] === 'created_at') {
+                } elseif ($column['name'] === 'created_at') {
                     $column['comment'] = '创建时间';
-                } else if ($column['name'] === 'updated_at') {
+                } elseif ($column['name'] === 'updated_at') {
                     $column['comment'] = '更新时间';
-                } else if ($column['name'] === 'deleted_at') {
+                } elseif ($column['name'] === 'deleted_at') {
                     $column['comment'] = '删除时间';
                 } else {
                     $column['comment'] = '';
@@ -126,7 +126,7 @@ trait SchemaTrait
         $namespace = str_replace('\\', '/', __NAMESPACE__);
         $namespace = str_replace('/', '\\', dirname($namespace));
 
-        if (!empty($table)) {
+        if (! empty($table)) {
             $singular = $this->getSingular($table['name']);
             $table = [
                 'tableName' => $table['name'],
@@ -137,9 +137,9 @@ trait SchemaTrait
             ];
         }
 
-        $resolver = '\\' . $namespace . '\\Resolvers\\' . Str::studly($genType) . 'Resolver';
+        $resolver = '\\'.$namespace.'\\Resolvers\\'.Str::studly($genType).'Resolver';
         if (method_exists($resolver, 'build')) {
-            $devConfig = new DevConfig();
+            $devConfig = new DevConfig;
             (new $resolver)->build($devConfig, $table);
         }
     }

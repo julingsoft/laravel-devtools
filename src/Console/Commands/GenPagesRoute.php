@@ -32,8 +32,9 @@ class GenPagesRoute extends Command
         $viewPath = resource_path('views/pages');
         $routeFilePath = base_path('routes/pages.php');
 
-        if (!File::isDirectory($viewPath)) {
+        if (! File::isDirectory($viewPath)) {
             $this->error('The resources/views/pages directory does not exist.');
+
             return;
         }
 
@@ -61,7 +62,7 @@ EOF;
             }
 
             $relativePath = str_replace('.blade.php', '', $relativePath);
-            $view = $name = 'pages.' . str_replace(['/', '\\'], '.', $relativePath);
+            $view = $name = 'pages.'.str_replace(['/', '\\'], '.', $relativePath);
             if (str_ends_with($name, '.index')) {
                 $name = Str::substr($name, 0, -6);
             }

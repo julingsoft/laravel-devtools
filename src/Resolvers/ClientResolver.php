@@ -79,7 +79,7 @@ EOF;
 
                         $requestBody = '';
                         foreach ($parameters as $k => $t) {
-                            $requestBody .= "'&{$k}='.\$".$k.".";
+                            $requestBody .= "'&{$k}='.\$".$k.'.';
                         }
                         $requestBody = '.\'?'.Str::substr($requestBody, 2, -1);
                     }
@@ -98,7 +98,7 @@ EOF;
                                 $requestParams .= ', '.$interface.' $formData';
                             }
 
-                            $requestBody .= ", \$formData->toArray()";
+                            $requestBody .= ', $formData->toArray()';
                         }
                     }
 
@@ -116,7 +116,7 @@ EOF;
                                 $requestParams .= ', '.$interface.' $formData';
                             }
 
-                            $requestBody .= ", \$formData->toArray()";
+                            $requestBody .= ', $formData->toArray()';
                             $requestBody .= ", headers: { 'Content-Type': 'multipart/form-data' }";
                         }
                     }
@@ -172,7 +172,7 @@ EOF;
             $content .= implode("\n", $apis);
         }
 
-        $content .= <<<EOF
+        $content .= <<<'EOF'
 }
 EOF;
 

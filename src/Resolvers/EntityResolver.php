@@ -16,7 +16,7 @@ class EntityResolver extends Foundation
     {
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($data['tableName']);
-            $dist = $devConfig->getDist('app/Bundles/' . $groupName . '/Entities');
+            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Entities');
             $data['namespace'] = "App\\Bundles\\$groupName";
         } else {
             $dist = $devConfig->getDist('app/Entities');
@@ -24,10 +24,10 @@ class EntityResolver extends Foundation
         }
         $this->ensureDirectoryExists($dist);
 
-        $data['tableColumns'] = $this->getTableColumns($data['tableName'], fn($fieldType) => $this->getFieldType($fieldType));
+        $data['tableColumns'] = $this->getTableColumns($data['tableName'], fn ($fieldType) => $this->getFieldType($fieldType));
 
-        $tpl = file_get_contents(__DIR__ . '/stubs/entity/entity.stub');
+        $tpl = file_get_contents(__DIR__.'/stubs/entity/entity.stub');
         $content = Blade::render($tpl, $data, deleteCachedView: true);
-        file_put_contents($dist . '/' . $data['className'] . 'Entity.php', "<?php\n\n" . $content);
+        file_put_contents($dist.'/'.$data['className'].'Entity.php', "<?php\n\n".$content);
     }
 }

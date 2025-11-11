@@ -27,8 +27,6 @@ class GenClient extends Command
 
     /**
      * 输出文件的目录
-     *
-     * @var string
      */
     private string $dist;
 

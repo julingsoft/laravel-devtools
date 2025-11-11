@@ -17,7 +17,7 @@ class EnumsResolver extends Foundation
     {
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($data['tableName']);
-            $dist = $devConfig->getDist('app/Bundles/' . $groupName . '/Enums');
+            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Enums');
             $data['namespace'] = "App\\Bundles\\$groupName";
         } else {
             $dist = $devConfig->getDist('app/Enums');
@@ -25,7 +25,7 @@ class EnumsResolver extends Foundation
         }
         $this->ensureDirectoryExists($dist);
 
-        $data['tableColumns'] = $this->getTableColumns($data['tableName'], fn($fieldType) => $this->getFieldType($fieldType));
+        $data['tableColumns'] = $this->getTableColumns($data['tableName'], fn ($fieldType) => $this->getFieldType($fieldType));
 
         foreach ($data['tableColumns'] as $column) {
             if ($column['type'] === 'enum' || $column['type_name'] === 'tinyint') {
@@ -53,7 +53,7 @@ class EnumsResolver extends Foundation
                 $enums = '';
                 $enumsType = 'int';
                 foreach ($enumsOptions as $enumOption) {
-                    $caseName = $enumsClass . $enumOption[0];
+                    $caseName = $enumsClass.$enumOption[0];
                     $caseVal = $enumOption[0];
                     $enums .= <<<EOF
 
@@ -63,19 +63,19 @@ class EnumsResolver extends Foundation
      */
     case $caseName = $caseVal;
 EOF;
-                    if (!is_numeric($caseVal)) {
+                    if (! is_numeric($caseVal)) {
                         $enumsType = 'string';
                     }
                 }
 
                 $data['comment'] = $enumsName;
-                $data['className'] = $data['className'] . $enumsClass;
+                $data['className'] = $data['className'].$enumsClass;
                 $data['enums'] = $enums;
                 $data['enumsType'] = $enumsType;
 
-                $tpl = file_get_contents(__DIR__ . '/stubs/enums/enums.stub');
+                $tpl = file_get_contents(__DIR__.'/stubs/enums/enums.stub');
                 $content = Blade::render($tpl, $data, deleteCachedView: true);
-                file_put_contents($dist . '/' . $data['className'] . 'Enum.php', "<?php\n\n" . $content);
+                file_put_contents($dist.'/'.$data['className'].'Enum.php', "<?php\n\n".$content);
             }
         }
     }

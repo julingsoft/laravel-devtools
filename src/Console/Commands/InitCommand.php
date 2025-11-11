@@ -26,7 +26,7 @@ class InitCommand extends Command
 
     public function handle(): void
     {
-        $devConfig = new DevConfig();
+        $devConfig = new DevConfig;
         $dist = $devConfig->getDist();
 
         $fs = new Filesystem;

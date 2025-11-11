@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Juling\DevTools;
 
 use Illuminate\Support\ServiceProvider;
-use Juling\DevTools\Console\Commands\GenBundleRoute;
 use Juling\DevTools\Console\Commands\GenClient;
 use Juling\DevTools\Console\Commands\GenController;
 use Juling\DevTools\Console\Commands\GenDict;
 use Juling\DevTools\Console\Commands\GenEntity;
 use Juling\DevTools\Console\Commands\GenEnums;
 use Juling\DevTools\Console\Commands\GenModel;
+use Juling\DevTools\Console\Commands\GenModuleRoute;
 use Juling\DevTools\Console\Commands\GenPagesRoute;
 use Juling\DevTools\Console\Commands\GenRepository;
 use Juling\DevTools\Console\Commands\GenRoute;
@@ -41,13 +41,13 @@ class DevToolsServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                GenBundleRoute::class,
                 GenClient::class,
                 GenController::class,
                 GenDict::class,
                 GenEntity::class,
                 GenEnums::class,
                 GenModel::class,
+                GenModuleRoute::class,
                 GenPagesRoute::class,
                 GenRepository::class,
                 GenRoute::class,

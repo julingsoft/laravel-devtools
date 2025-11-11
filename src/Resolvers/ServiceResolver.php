@@ -45,8 +45,11 @@ class ServiceResolver extends Foundation
             $data['useNamespace'] = 'App';
         }
 
-        $tpl = file_get_contents(__DIR__ . '/stubs/service/service.stub');
-        $content = Blade::render($tpl, $data, deleteCachedView: true);
-        file_put_contents($dist . '/' . $data['className'] . 'Service.php', "<?php\n\n" . $content);
+		$serviceFile = $dist . '/' . $data['className'] . 'Service.php';
+		if (!file_exist($serviceFile)) {
+            $tpl = file_get_contents(__DIR__ . '/stubs/service/service.stub');
+            $content = Blade::render($tpl, $data, deleteCachedView: true);
+            file_put_contents($serviceFile, "<?php\n\n" . $content);		
+		}
     }
 }

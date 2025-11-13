@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Juling\DevTools;
 
 use Illuminate\Support\ServiceProvider;
-use Juling\DevTools\Console\Commands\GenClient;
+use Juling\DevTools\Console\Commands\GenBundleRoute;
 use Juling\DevTools\Console\Commands\GenController;
 use Juling\DevTools\Console\Commands\GenDict;
 use Juling\DevTools\Console\Commands\GenEntity;
@@ -41,7 +41,7 @@ class DevToolsServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                GenClient::class,
+                GenBundleRoute::class,
                 GenController::class,
                 GenDict::class,
                 GenEntity::class,

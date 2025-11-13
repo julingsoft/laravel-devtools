@@ -45,7 +45,7 @@ class ServiceResolver extends Foundation
         }
 
         $serviceFile = $dist.'/'.$data['className'].'Service.php';
-        if (! file_exist($serviceFile)) {
+        if (! file_exists($serviceFile)) {
             $tpl = file_get_contents(__DIR__.'/stubs/service/service.stub');
             $content = Blade::render($tpl, $data, deleteCachedView: true);
             file_put_contents($serviceFile, "<?php\n\n".$content);

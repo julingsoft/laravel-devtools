@@ -3,7 +3,7 @@
 return [
     'dist' => storage_path('code'),
     'multi_module' => true,
-    'ignore_tables' => [
+    'exclude_tables' => [
         'cache',
         'cache_locks',
         'failed_jobs',
@@ -14,16 +14,19 @@ return [
         'personal_access_tokens',
         'sessions',
     ],
-    'ignore_columns' => [
+    'exclude_columns' => [
         'created_at',
         'updated_at',
         'deleted_at',
         'user' => [
             'xxxx',
-        ]
+        ],
     ],
-    'ignore_controllers' => [
+    'exclude_controllers' => [
         'base',
+    ],
+    'exclude_views' => [
+        'login',
     ],
     'ignore_singular' => true,
 ];

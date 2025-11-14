@@ -29,10 +29,9 @@ class ModuleRouteResolver extends Foundation
 
             $moduleName = basename($modulePath);
             $controllerRoutes = $this->getControllerRoutes($modulePath);
-            $viewRoutes = $this->getViewRoutes($moduleName, $modulePath);
-            $routes = $this->getRouteContent($moduleName, $controllerRoutes, $viewRoutes);
+            $routes = $this->getRouteContent($moduleName, $controllerRoutes);
 
-            file_put_contents($dist.'/web.php', $this->getTemplate($routes));
+            file_put_contents($dist.'/route.php', $this->getTemplate($routes));
         }
     }
 
@@ -44,7 +43,7 @@ class ModuleRouteResolver extends Foundation
         $files = glob($modulePath.'/Controllers/*Controller.php');
 
         $routes = [];
-        $ignoreControllers = config('devtools.ignore_controllers');
+        $ignoreControllers = config('devtools.exclude_controllers');
         foreach ($files as $file) {
             $file = str_replace('/', '\\', $file);
             preg_match('/(app\\\\.+?\\\\(\w+)Controller)\.php/', $file, $matches);
@@ -56,39 +55,6 @@ class ModuleRouteResolver extends Foundation
         }
 
         return $routes;
-    }
-
-    private function getViewRoutes(string $module, string $modulePath): string
-    {
-        $module = Str::lower($module);
-
-        $exclude = ['login']; // config('devtools.exclude_views');
-        $routeContent = "\n\n    // view route start";
-        $routeContent .= "\n    Route::name('{$module}.')->group(function () {";
-
-        $files = File::allFiles($modulePath.'/Views');
-        foreach ($files as $file) {
-            $view = Str::replace('\\', '/', $file->getPathname());
-            preg_match('/Views\/(.+?)\.blade\.php/', $view, $matches);
-            if (isset($matches[1])) {
-                $routePath = $matches[1];
-                $routeName = Str::replace('/', '.', $routePath);
-                $routeView = $module.'::'.$routeName;
-                if (in_array($routePath, $exclude) || str_contains($routePath, 'layouts')) {
-                    continue;
-                }
-                if (Str::substr($routePath, -6) === '/index') {
-                    $routePath = Str::substr($routePath, 0, -6);
-                } elseif ($routePath === 'index') {
-                    $routePath = '/';
-                }
-                $routeContent .= "\n        Route::view('{$routePath}', '{$routeView}')->name('{$routeName}');";
-            }
-        }
-        $routeContent .= "\n    });";
-        $routeContent .= "\n    // view route end";
-
-        return $routeContent;
     }
 
     /**
@@ -127,11 +93,11 @@ class ModuleRouteResolver extends Foundation
         return $routes;
     }
 
-    private function getRouteContent(string $module, array $routes, string $extras = ''): string
+    private function getRouteContent(string $module, array $routes): string
     {
         $module = Str::camel($module);
         $routeContent = '// '.$module.' route start';
-        $routeContent .= "\nRoute::prefix('{$module}')->middleware('web')->group(function () {";
+        $routeContent .= "\nRoute::prefix('{$module}')->middleware('web')->name('{$module}.')->group(function () {";
         foreach ($routes as $route) {
             $routeContent .= "\n    // ".$route['summary'];
             $routeContent .= "\n    Route::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";
@@ -144,7 +110,6 @@ class ModuleRouteResolver extends Foundation
             }
             $routeContent .= ';';
         }
-        $routeContent .= $extras;
         $routeContent .= "\n});";
         $routeContent .= "\n// end";
 

@@ -40,7 +40,7 @@ class BundleRouteResolver extends Foundation
     {
         $routes = [];
 
-        $ignoreControllers = config('devtools.ignore_controllers');
+        $ignoreControllers = config('devtools.exclude_controllers');
         foreach ($files as $file) {
             $file = str_replace('/', '\\', $file);
             preg_match('/(app\\\\.+?\\\\(\w+)Controller)\.php/', $file, $matches);

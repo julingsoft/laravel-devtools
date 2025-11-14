@@ -32,12 +32,12 @@ class DevConfig
 
     public function getIgnoreTables(): array
     {
-        return $this->config['ignore_tables'];
+        return $this->config['exclude_tables'];
     }
 
     public function getIgnoreColumns(string $tableName = ''): array
     {
-        $ignoreColumns = $this->config['ignore_columns'];
+        $ignoreColumns = $this->config['exclude_columns'];
 
         $columns = array_filter($ignoreColumns, function ($v, $k) {
             return is_int($k);
@@ -52,7 +52,7 @@ class DevConfig
 
     public function getIgnoreControllers(): array
     {
-        return $this->config['ignore_controllers'];
+        return $this->config['exclude_controllers'];
     }
 
     public function getIgnoreSingular(): bool

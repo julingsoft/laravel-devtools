@@ -29,6 +29,9 @@ class ModulePageRouteResolver extends Foundation
 
             $moduleName = basename($modulePath);
             $routes = $this->getViewRoutes($moduleName, $modulePath);
+            if (empty($routes)) {
+                continue;
+            }
 
             file_put_contents($dist.'/web.php', $this->getTemplate($routes));
         }
@@ -36,13 +39,16 @@ class ModulePageRouteResolver extends Foundation
 
     private function getViewRoutes(string $module, string $modulePath): string
     {
-        $module = Str::lower($module);
+        $files = File::allFiles($modulePath.'/Pages');
+        if (count($files) === 0) {
+            return '';
+        }
 
+        $module = Str::lower($module);
         $exclude = config('devtools.exclude_views');
         $routeContent = '// Route start';
         $routeContent .= "\nRoute::prefix('{$module}')->middleware('web')->name('{$module}.')->group(function () {";
 
-        $files = File::allFiles($modulePath.'/Pages');
         foreach ($files as $file) {
             $view = Str::replace('\\', '/', $file->getPathname());
             preg_match('/Pages\/(.+?)\.blade\.php/', $view, $matches);

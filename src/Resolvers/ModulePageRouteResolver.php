@@ -24,6 +24,10 @@ class ModulePageRouteResolver extends Foundation
     {
         $modules = glob(app_path('Modules/*'), GLOB_ONLYDIR);
         foreach ($modules as $modulePath) {
+            if (! is_dir($modulePath.'/Pages')) {
+                continue;
+            }
+
             $dist = $modulePath.'/Routes';
             $this->ensureDirectoryExists($dist);
 

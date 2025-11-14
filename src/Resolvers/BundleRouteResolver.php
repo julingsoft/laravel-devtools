@@ -26,7 +26,7 @@ class BundleRouteResolver extends Foundation
             $dist = $bundlePath.'/Routes';
             $this->ensureDirectoryExists($dist);
 
-            $controllers = glob($bundlePath.'/Http/Controllers/*Controller.php');
+            $controllers = glob($bundlePath.'/Controllers/*Controller.php');
             $routes = $this->getRouteContent(basename($bundlePath), $this->getRoutes($controllers));
 
             file_put_contents($dist.'/route.php', $this->getTemplate($routes));

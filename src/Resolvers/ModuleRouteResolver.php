@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Juling\DevTools\Resolvers;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Juling\DevTools\Support\DevConfig;
 use Juling\DevTools\Support\SchemaTrait;
@@ -26,20 +27,23 @@ class ModuleRouteResolver extends Foundation
             $dist = $modulePath.'/Routes';
             $this->ensureDirectoryExists($dist);
 
-            $controllers = glob($modulePath.'/Http/Controllers/*Controller.php');
-            $routes = $this->getRouteContent(basename($modulePath), $this->getRoutes($controllers));
+            $moduleName = basename($modulePath);
+            $controllerRoutes = $this->getControllerRoutes($modulePath);
+            $viewRoutes = $this->getViewRoutes($moduleName, $modulePath);
+            $routes = $this->getRouteContent($moduleName, $controllerRoutes, $viewRoutes);
 
-            file_put_contents($dist.'/route.php', $this->getTemplate($routes));
+            file_put_contents($dist.'/web.php', $this->getTemplate($routes));
         }
     }
 
     /**
      * @throws ReflectionException
      */
-    private function getRoutes(array $files): array
+    private function getControllerRoutes(string $modulePath): array
     {
-        $routes = [];
+        $files = glob($modulePath.'/Controllers/*Controller.php');
 
+        $routes = [];
         $ignoreControllers = config('devtools.ignore_controllers');
         foreach ($files as $file) {
             $file = str_replace('/', '\\', $file);
@@ -52,6 +56,39 @@ class ModuleRouteResolver extends Foundation
         }
 
         return $routes;
+    }
+
+    private function getViewRoutes(string $module, string $modulePath): string
+    {
+        $module = Str::lower($module);
+
+        $exclude = ['login']; // config('devtools.exclude_views');
+        $routeContent = "\n\n    // view route start";
+        $routeContent .= "\n    Route::name('{$module}.')->group(function () {";
+
+        $files = File::allFiles($modulePath.'/Views');
+        foreach ($files as $file) {
+            $view = Str::replace('\\', '/', $file->getPathname());
+            preg_match('/Views\/(.+?)\.blade\.php/', $view, $matches);
+            if (isset($matches[1])) {
+                $routePath = $matches[1];
+                $routeName = Str::replace('/', '.', $routePath);
+                $routeView = $module.'::'.$routeName;
+                if (in_array($routePath, $exclude) || str_contains($routePath, 'layouts')) {
+                    continue;
+                }
+                if (Str::substr($routePath, -6) === '/index') {
+                    $routePath = Str::substr($routePath, 0, -6);
+                } elseif ($routePath === 'index') {
+                    $routePath = '/';
+                }
+                $routeContent .= "\n        Route::view('{$routePath}', '{$routeView}')->name('{$routeName}');";
+            }
+        }
+        $routeContent .= "\n    });";
+        $routeContent .= "\n    // view route end";
+
+        return $routeContent;
     }
 
     /**
@@ -90,11 +127,11 @@ class ModuleRouteResolver extends Foundation
         return $routes;
     }
 
-    private function getRouteContent(string $module, array $routes): string
+    private function getRouteContent(string $module, array $routes, string $extras = ''): string
     {
         $module = Str::camel($module);
         $routeContent = '// '.$module.' route start';
-        $routeContent .= "\nRoute::prefix('/')->group(function () {";
+        $routeContent .= "\nRoute::prefix('{$module}')->middleware('web')->group(function () {";
         foreach ($routes as $route) {
             $routeContent .= "\n    // ".$route['summary'];
             $routeContent .= "\n    Route::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";
@@ -107,6 +144,7 @@ class ModuleRouteResolver extends Foundation
             }
             $routeContent .= ';';
         }
+        $routeContent .= $extras;
         $routeContent .= "\n});";
         $routeContent .= "\n// end";
 

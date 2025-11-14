@@ -34,9 +34,9 @@ class ControllerResolver extends Foundation
 
         $devConfig = new DevConfig;
         if ($devConfig->getMultiModule()) {
-            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Http/Controllers');
+            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Controllers');
             $baseNamespace = "App\\Bundles\\$groupName";
-            $namespace = $baseNamespace.'\\Http';
+            $namespace = $baseNamespace;
             $entityNamespace = "App\\Bundles\\$groupName";
         } else {
             $dist = $devConfig->getDist('app/Api/'.$outDir.'/Controllers');
@@ -129,8 +129,8 @@ class ControllerResolver extends Foundation
         $devConfig = new DevConfig;
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName(Str::snake($className));
-            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Http/Requests/'.$className);
-            $namespace = "App\\Bundles\\$groupName\\Http";
+            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Requests/'.$className);
+            $namespace = "App\\Bundles\\$groupName";
         } else {
             $dist = $devConfig->getDist('app/Api/'.$outDir.'/Requests/'.$className);
             $namespace = 'App\\Api\\'.$outDir;
@@ -150,8 +150,8 @@ class ControllerResolver extends Foundation
         $devConfig = new DevConfig;
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName(Str::snake($className));
-            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Http/Responses/'.$className);
-            $namespace = "App\\Bundles\\$groupName\\Http";
+            $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Responses/'.$className);
+            $namespace = "App\\Bundles\\$groupName";
         } else {
             $dist = $devConfig->getDist('app/Api/'.$outDir.'/Responses/'.$className);
             $namespace = 'App\\Api\\'.$outDir;

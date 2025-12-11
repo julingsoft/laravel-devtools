@@ -1,8 +1,8 @@
 declare(strict_types=1);
 
-namespace {{ $namespace }}\Services;
+namespace {{ $namespace }};
 
-use {{ $namespace }}\Repositories\{{ $className }}Repository;
+use {{ $useNamespace }}\Repositories\{{ $className }}Repository;
 use Juling\Foundation\Contracts\ServiceInterface;
 use Juling\Foundation\Services\CommonService;
 

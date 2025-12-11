@@ -35,22 +35,22 @@ class ControllerResolver extends Foundation
         $devConfig = new DevConfig;
         if ($devConfig->getMultiModule()) {
             $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Controllers');
-            $baseNamespace = "App\\Bundles\\$groupName";
-            $namespace = $baseNamespace;
-            $entityNamespace = "App\\Bundles\\$groupName";
+            $namespace = "App\\Bundles\\$groupName";
+            $entityNamespace = "App\\Bundles\\$groupName\\Entities";
+            $serviceNamespace = "App\\Bundles\\$groupName\\Services";
         } else {
             $dist = $devConfig->getDist('app/Api/'.$outDir.'/Controllers');
-            $baseNamespace = 'App';
-            $namespace = $baseNamespace.'\\Api\\'.$outDir;
-            $entityNamespace = 'App';
+            $namespace = 'App\\Api\\'.$outDir;
+            $entityNamespace = 'App\\Entities';
+            $serviceNamespace = 'App\\Services';
         }
 
         $this->ensureDirectoryExists($dist);
 
         $content = Blade::render(file_get_contents(__DIR__.'/stubs/controller/controller.stub'), [
             'namespace' => $namespace,
-            'baseNamespace' => $baseNamespace,
             'entityNamespace' => $entityNamespace,
+            'serviceNamespace' => $serviceNamespace,
             'className' => $className,
             'groupName' => $groupName,
             'classCamelName' => Str::camel($className),

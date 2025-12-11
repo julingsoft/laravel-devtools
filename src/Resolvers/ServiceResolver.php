@@ -17,10 +17,12 @@ class ServiceResolver extends Foundation
         if ($devConfig->getMultiModule()) {
             $groupName = $this->getTableGroupName($data['tableName']);
             $dist = $devConfig->getDist('app/Bundles/'.$groupName.'/Services');
-            $data['namespace'] = "App\\Bundles\\$groupName";
+            $data['namespace'] = "App\\Bundles\\$groupName\\Services";
+            $data['useNamespace'] = "App\\Bundles\\$groupName";
         } else {
-            $dist = $devConfig->getDist('app/Services');
-            $data['namespace'] = 'App';
+            $dist = $devConfig->getDist('app/Bundles');
+            $data['namespace'] = 'App\\Bundles';
+            $data['useNamespace'] = 'App';
         }
         $this->ensureDirectoryExists($dist);
 
@@ -33,16 +35,17 @@ class ServiceResolver extends Foundation
 
     private function baseService(DevConfig $devConfig, array $data): void
     {
-        $data['groupName'] = $this->getTableGroupName($data['tableName']);
-        $data['namespace'] = 'App\\Services\\'.$data['groupName'];
-        $dist = $devConfig->getDist('app/Services/'.$data['groupName']);
-        $this->ensureDirectoryExists($dist);
-
         if ($devConfig->getMultiModule()) {
-            $data['useNamespace'] = 'App\\Bundles\\'.$data['groupName'];
+            $groupName = $this->getTableGroupName($data['tableName']);
+            $dist = $devConfig->getDist('app/Services/'.$groupName);
+            $data['namespace'] = 'App\\Services\\'.$groupName;
+            $data['useNamespace'] = 'App\\Bundles\\'.$groupName.'\\Services';
         } else {
-            $data['useNamespace'] = 'App';
+            $dist = $devConfig->getDist('app/Services');
+            $data['namespace'] = 'App\\Services';
+            $data['useNamespace'] = 'App\\Bundles';
         }
+        $this->ensureDirectoryExists($dist);
 
         $serviceFile = $dist.'/'.$data['className'].'Service.php';
         if (! file_exists($serviceFile)) {

@@ -2,7 +2,7 @@ declare(strict_types=1);
 
 namespace {{ $namespace }};
 
-use {{ $useNamespace }}\Services\{{ $className }}BundleService;
+use {{ $useNamespace }}\{{ $className }}BundleService;
 
 class {{ $className }}Service extends {{ $className }}BundleService
 {

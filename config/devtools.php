@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'dist' => storage_path('code'),
+    'dist' => base_path(),
     'multi_module' => true,
     'exclude_tables' => [
         'cache',

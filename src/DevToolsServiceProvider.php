@@ -28,14 +28,11 @@ class DevToolsServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                Commands\GenBundleRoute::class,
                 Commands\GenController::class,
                 Commands\GenDict::class,
                 Commands\GenEntity::class,
                 Commands\GenEnums::class,
                 Commands\GenModel::class,
-                Commands\GenModulePageRoute::class,
-                Commands\GenModuleRoute::class,
                 Commands\GenPagesRoute::class,
                 Commands\GenRepository::class,
                 Commands\GenRoute::class,

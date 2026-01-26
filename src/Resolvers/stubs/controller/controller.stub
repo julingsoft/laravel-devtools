@@ -3,6 +3,12 @@ declare(strict_types=1);
 namespace {{ $namespace }}\Controllers;
 
 use App\Api\Admin\Controllers\BaseController;
+use {{ $entityNamespace }}\{{ $className }}Entity;
+@if(str_contains($serviceNamespace, 'Bundles'))
+use {{ $serviceNamespace }}\{{ $className }}BundleService as {{ $className }}Service;
+@else
+use {{ $serviceNamespace }}\{{ $className }}Service;
+@endif
 use {{ $namespace }}\Requests\{{ $className }}\{{ $className }}CreateRequest;
 use {{ $namespace }}\Requests\{{ $className }}\{{ $className }}DestroyRequest;
 use {{ $namespace }}\Requests\{{ $className }}\{{ $className }}QueryRequest;
@@ -10,8 +16,6 @@ use {{ $namespace }}\Requests\{{ $className }}\{{ $className }}UpdateRequest;
 use {{ $namespace }}\Responses\{{ $className }}\{{ $className }}DestroyResponse;
 use {{ $namespace }}\Responses\{{ $className }}\{{ $className }}QueryResponse;
 use {{ $namespace }}\Responses\{{ $className }}\{{ $className }}Response;
-use {{ $entityNamespace }}\{{ $className }}Entity;
-use {{ $serviceNamespace }}\{{ $className }}Service;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

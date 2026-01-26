@@ -21,19 +21,18 @@ class RouteResolver extends Foundation
      */
     public function build(DevConfig $devConfig, array $data): void
     {
-        $dirs = glob(app_path('Api/*'), GLOB_ONLYDIR);
+        $dirs = array_merge(
+            glob(app_path('Api/*'), GLOB_ONLYDIR),
+            glob(app_path('Bundles/*'), GLOB_ONLYDIR),
+            glob(app_path('Modules/*'), GLOB_ONLYDIR)
+        );
         foreach ($dirs as $dir) {
-            $module = basename($dir);
-
-            $dist = app_path('Api/'.$module.'/Routes');
+            $dist = $dir.'/Routes';
             $this->ensureDirectoryExists($dist);
 
-            $routes = $this->getRoutes(array_merge(
-                glob($dir.'/Controllers/*Controller.php'),
-                glob(app_path('Bundles/*/Controllers/'.$module.'/*Controller.php'))
-            ));
-
-            $this->genRoutes($module, $routes, $dist.'/route.php');
+            $controllers = glob($dir.'/Controllers/*Controller.php');
+            $routes = $this->getRouteContent($this->getRoutes($controllers));
+            file_put_contents($dist.'/route.gen.php', $this->getTemplate($routes));
         }
     }
 
@@ -74,6 +73,9 @@ class RouteResolver extends Foundation
             $methodAttributes = $reflectionClass->getMethod($method->name)->getAttributes();
             if (isset($methodAttributes[0])) {
                 $methodAttribute = $methodAttributes[0];
+                if (! isset($methodAttribute->getArguments()['path'])) {
+                    exit('Route path not found:'.$class.'@'.$method->name);
+                }
 
                 $httpMethod = Str::lower(Arr::last(explode('\\', $methodAttribute->getName())));
                 $path = $methodAttribute->getArguments()['path'];
@@ -91,21 +93,24 @@ class RouteResolver extends Foundation
         return $routes;
     }
 
-    private function genRoutes(string $module, array $routes, string $routeFile): void
+    private function getRouteContent(array $routes): string
     {
-        $module = Str::camel($module);
-        $routeContent = '// Route start';
-        $routeContent .= "\nRoute::prefix('{$module}')->group(function () {";
+        $routeContent = '';
         foreach ($routes as $route) {
-            $routeContent .= "\n    // ".$route['summary'];
-            $routeContent .= "\n    Route::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";
+            $routeContent .= "\n// ".$route['summary'];
+            $routeContent .= "\nRoute::{$route['httpMethod']}('{$route['path']}', [\\{$route['class']}::class, '{$route['action']}'])";
+            if ($route['httpMethod'] === 'get') {
+                $name = 'index';
+                if ($route['path'] !== '/') {
+                    $name = Str::replace('/', '.', $route['path']);
+                }
+                $routeContent .= "->name('$name')";
+            }
             $routeContent .= ';';
         }
-        $routeContent .= "\n});";
-        $routeContent .= "\n// end";
+        $routeContent .= "\n";
 
-        $content = $this->getTemplate($routeContent);
-        file_put_contents($routeFile, $content);
+        return $routeContent;
     }
 
     private function getTemplate($content): string
@@ -120,9 +125,7 @@ class RouteResolver extends Foundation
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-
 $content
-
 EOF;
     }
 }

@@ -109,12 +109,12 @@ if (isset($requestData[{{ $className }}QueryRequest::get{{$index['studly_name']}
 
         try {
             ${{ $serviceCamelName }}Service = new {{ $serviceName }}Service;
-            ${{ $serviceCamelName }} = ${{ $serviceCamelName }}Service->getOneById($id);
-            if (empty(${{ $serviceCamelName }})) {
+            ${{ $classCamelName }} = ${{ $serviceCamelName }}Service->getOneById($id);
+            if (empty(${{ $classCamelName }})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
-            $response = new {{ $className }}Response(${{ $serviceCamelName }});
+            $response = new {{ $className }}Response(${{ $classCamelName }});
 
             return $this->success($response->toArray());
         } catch (Throwable $e) {
@@ -140,8 +140,8 @@ if (isset($requestData[{{ $className }}QueryRequest::get{{$index['studly_name']}
         DB::beginTransaction();
         try {
             ${{ $serviceCamelName }}Service = new {{ $serviceName }}Service;
-            ${{ $serviceCamelName }} = ${{ $serviceCamelName }}Service->getOneById($id);
-            if (empty(${{ $serviceCamelName }})) {
+            ${{ $classCamelName }} = ${{ $serviceCamelName }}Service->getOneById($id);
+            if (empty(${{ $classCamelName }})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 

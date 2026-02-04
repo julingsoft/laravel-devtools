@@ -38,11 +38,13 @@ class ControllerResolver extends Foundation
             $namespace = "App\\Bundles\\$groupName";
             $entityNamespace = "App\\Bundles\\$groupName\\Entities";
             $serviceNamespace = "App\\Bundles\\$groupName\\Services";
+            $serviceName = $className.'Bundle';
         } else {
             $dist = $devConfig->getDist('app/Api/'.$outDir.'/Controllers');
             $namespace = 'App\\Api\\'.$outDir;
             $entityNamespace = 'App\\Entities';
             $serviceNamespace = 'App\\Services';
+            $serviceName = $className;
         }
 
         $this->ensureDirectoryExists($dist);
@@ -54,6 +56,8 @@ class ControllerResolver extends Foundation
             'className' => $className,
             'groupName' => $groupName,
             'classCamelName' => Str::camel($className),
+            'serviceName' => $serviceName,
+            'serviceCamelName' => Str::camel($serviceName),
             'tableIndexes' => $indexes,
             'comment' => $comment,
         ], deleteCachedView: true);

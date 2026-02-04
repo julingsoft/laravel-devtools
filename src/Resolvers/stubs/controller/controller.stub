@@ -4,11 +4,7 @@ namespace {{ $namespace }}\Controllers;
 
 use App\Api\Admin\Controllers\BaseController;
 use {{ $entityNamespace }}\{{ $className }}Entity;
-@if(str_contains($serviceNamespace, 'Bundles'))
-use {{ $serviceNamespace }}\{{ $className }}BundleService as {{ $className }}Service;
-@else
-use {{ $serviceNamespace }}\{{ $className }}Service;
-@endif
+use {{ $serviceNamespace }}\{{ $serviceName }}Service;
 use {{ $namespace }}\Requests\{{ $className }}\{{ $className }}CreateRequest;
 use {{ $namespace }}\Requests\{{ $className }}\{{ $className }}DestroyRequest;
 use {{ $namespace }}\Requests\{{ $className }}\{{ $className }}QueryRequest;
@@ -46,8 +42,8 @@ if (isset($requestData[{{ $className }}QueryRequest::get{{$index['studly_name']}
             }
             @endforeach
 
-            ${{ $classCamelName }}Service = new {{ $className }}Service;
-            $result = ${{ $classCamelName }}Service->page($condition, $page, $pageSize);
+            ${{ $serviceCamelName }}Service = new {{ $serviceName }}Service;
+            $result = ${{ $serviceCamelName }}Service->page($condition, $page, $pageSize);
 
             foreach ($result['data'] as $key => $item) {
                 $response = new {{ $className }}Response($item);
@@ -83,8 +79,8 @@ if (isset($requestData[{{ $className }}QueryRequest::get{{$index['studly_name']}
         try {
             $input = new {{ $className }}Entity($requestData);
 
-            ${{ $classCamelName }}Service = new {{ $className }}Service;
-            if (${{ $classCamelName }}Service->save($input->toEntity())) {
+            ${{ $serviceCamelName }}Service = new {{ $serviceName }}Service;
+            if (${{ $serviceCamelName }}Service->save($input->toEntity())) {
                 DB::commit();
 
                 return $this->success();
@@ -112,13 +108,13 @@ if (isset($requestData[{{ $className }}QueryRequest::get{{$index['studly_name']}
         $id = intval($request->query('id', 0));
 
         try {
-            ${{ $classCamelName }}Service = new {{ $className }}Service;
-            ${{ $classCamelName }} = ${{ $classCamelName }}Service->getOneById($id);
-            if (empty(${{ $classCamelName }})) {
+            ${{ $serviceCamelName }}Service = new {{ $serviceName }}Service;
+            ${{ $serviceCamelName }} = ${{ $serviceCamelName }}Service->getOneById($id);
+            if (empty(${{ $serviceCamelName }})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
-            $response = new {{ $className }}Response(${{ $classCamelName }});
+            $response = new {{ $className }}Response(${{ $serviceCamelName }});
 
             return $this->success($response->toArray());
         } catch (Throwable $e) {
@@ -143,15 +139,15 @@ if (isset($requestData[{{ $className }}QueryRequest::get{{$index['studly_name']}
 
         DB::beginTransaction();
         try {
-            ${{ $classCamelName }}Service = new {{ $className }}Service;
-            ${{ $classCamelName }} = ${{ $classCamelName }}Service->getOneById($id);
-            if (empty(${{ $classCamelName }})) {
+            ${{ $serviceCamelName }}Service = new {{ $serviceName }}Service;
+            ${{ $serviceCamelName }} = ${{ $serviceCamelName }}Service->getOneById($id);
+            if (empty(${{ $serviceCamelName }})) {
                 throw new BusinessException(BusinessEnum::NOT_FOUND);
             }
 
             $input = new {{ $className }}Entity($requestData);
 
-            ${{ $classCamelName }}Service->updateById($input->toEntity(), $id);
+            ${{ $serviceCamelName }}Service->updateById($input->toEntity(), $id);
 
             DB::commit();
 
@@ -178,8 +174,8 @@ if (isset($requestData[{{ $className }}QueryRequest::get{{$index['studly_name']}
 
         DB::beginTransaction();
         try {
-            ${{ $classCamelName }}Service = new {{ $className }}Service;
-            if (${{ $classCamelName }}Service->removeByIds($requestData['ids'])) {
+            ${{ $serviceCamelName }}Service = new {{ $serviceName }}Service;
+            if (${{ $serviceCamelName }}Service->removeByIds($requestData['ids'])) {
                 DB::commit();
 
                 return $this->success();
